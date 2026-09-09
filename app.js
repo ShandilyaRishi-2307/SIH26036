@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const port = 8080;
+const port = process.env.PORT || 8080;
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
@@ -26,19 +26,35 @@ app.use('/images', express.static(path.join(__dirname, 'views/images')));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+if (!process.env.MONGODB_URI) {
+    console.error('⚠️ CRITICAL: MONGODB_URI is not set in environment variables! Database features will not work.');
+}
+
 mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((err) => console.error('MongoDB connection error:', err));
+    .then(() => console.log('✅ Connected to MongoDB successfully'))
+    .catch((err) => console.error('❌ MongoDB connection error:', err.message || err));
 
 const firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.FIREBASE_APP_ID
+    apiKey: (process.env.FIREBASE_API_KEY || '').trim(),
+    authDomain: (process.env.FIREBASE_AUTH_DOMAIN || '').trim(),
+    projectId: (process.env.FIREBASE_PROJECT_ID || '').trim(),
+    storageBucket: (process.env.FIREBASE_STORAGE_BUCKET || '').trim(),
+    messagingSenderId: (process.env.FIREBASE_MESSAGING_SENDER_ID || '').trim(),
+    appId: (process.env.FIREBASE_APP_ID || '').trim()
 };
 app.locals.firebaseConfig = firebaseConfig;
+
+// Health check endpoint for deployment monitoring
+app.get('/health', (req, res) => {
+    const dbState = mongoose.connection.readyState;
+    const states = ['Disconnected', 'Connected', 'Connecting', 'Disconnecting'];
+    res.json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        mongodb: states[dbState] || 'Unknown',
+        uptime: process.uptime()
+    });
+});
 
 // --- Inspector Middleware Fix ---
 const verifyInspector = (req, res, next) => {
@@ -56,20 +72,56 @@ app.get('/login', (req, res) => res.render('login', { firebaseConfig }));
 
 app.post('/api/users', verifyToken, async (req, res) => {
     try {
-        const newUser = new User({ firebaseUid: req.user.uid, email: req.user.email, role: req.body.role });
-        await newUser.save();
+        let user = await User.findOne({ firebaseUid: req.user.uid });
+        if (!user && req.user.email) {
+            user = await User.findOne({ email: req.user.email });
+            if (user) {
+                user.firebaseUid = req.user.uid;
+                await user.save();
+                return res.status(200).json({ success: true, message: 'User updated' });
+            }
+        }
+        if (!user) {
+            user = new User({ firebaseUid: req.user.uid, email: req.user.email, role: req.body.role || 'Owner' });
+            await user.save();
+        }
         res.status(201).json({ success: true });
-    } catch (error) { res.status(500).json({ success: false }); }
+    } catch (error) { 
+        console.error('Error creating/updating user in /api/users:', error);
+        res.status(500).json({ success: false, error: error.message }); 
+    }
 });
 
 app.get('/auth/redirect', verifyToken, async (req, res) => {
     try {
-        const user = await User.findOne({ firebaseUid: req.user.uid });
-        if (!user) return res.redirect('/login');
+        let user = await User.findOne({ firebaseUid: req.user.uid });
+
+        // Fallback: If user authenticated in Firebase but doesn't exist in MongoDB yet, provision them
+        if (!user && req.user.email) {
+            user = await User.findOne({ email: req.user.email });
+            if (user) {
+                user.firebaseUid = req.user.uid;
+                await user.save();
+            }
+        }
+
+        if (!user) {
+            console.log(`Auto-creating new Owner profile for Firebase UID: ${req.user.uid} (${req.user.email})`);
+            user = new User({
+                firebaseUid: req.user.uid,
+                email: req.user.email || 'unknown@truescale.com',
+                role: 'Owner'
+            });
+            await user.save();
+        }
+
         if (user.role === 'Owner') return res.redirect(`/owner/${user._id}`);
         if (user.role === 'Inspector') return res.redirect(`/inspect/${user._id}`);
         res.redirect('/login');
-    } catch (error) { res.status(500).send('Server Error'); }
+    } catch (error) { 
+        console.error('CRITICAL Error in /auth/redirect:', error);
+        res.status(500).send(`Server Error: ${error.message || 'Error communicating with database.'}`); 
+    }
 });
 
 // --- Admin Portal ---
