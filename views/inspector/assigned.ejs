@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Assigned Inspections — TrueScale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-dark: #001e2b;
+            --ts-dark-surface: #072734;
+            --ts-green: #00ed64;
+            --ts-green-dark: #00684a;
+            --ts-green-light: #e8fff1;
+            --ts-gray-50: #f8fafc;
+            --ts-gray-100: #f1f5f9;
+            --ts-gray-200: #e2e8f0;
+            --ts-gray-400: #94a3b8;
+            --ts-gray-600: #475569;
+            --ts-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            min-height: 100dvh;
+            background-color: var(--ts-gray-50);
+            color: var(--ts-dark);
+            overflow-x: hidden;
+        }
+
+        /* Desktop Sidebar */
+        .sidebar {
+            width: 260px;
+            min-height: 100dvh;
+            background: var(--ts-dark);
+            color: white;
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100dvh;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 32px;
+            color: white;
+            text-decoration: none;
+            padding: 0 6px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover .brand-icon {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        .side-title {
+            color: #5c7983;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 10px 8px 6px;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #b8c8cc;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: #08232e;
+            color: white;
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: #123d48;
+            color: var(--ts-green);
+            font-weight: 700;
+            box-shadow: inset 3px 0 0 var(--ts-green);
+        }
+
+        .sidebar-logout {
+            margin-top: auto;
+            color: #ff6b6b;
+            padding: 12px 14px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-logout:hover {
+            background: rgba(255, 107, 107, 0.12);
+            color: #ff8585;
+        }
+
+        /* Mobile Topbar & Drawer */
+        .mobile-topbar {
+            display: none;
+            height: 64px;
+            background: var(--ts-dark);
+            color: white;
+            padding: 0 16px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .mobile-topbar .brand {
+            margin-bottom: 0;
+            font-size: 18px;
+            padding: 0;
+        }
+
+        .mobile-topbar .brand-icon {
+            width: 34px;
+            height: 34px;
+        }
+
+        .mobile-menu-btn {
+            background: #082833;
+            border: 1px solid #14404f;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .drawer-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 20, 28, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1100;
+        }
+
+        .drawer-backdrop.active {
+            display: block;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: min(82vw, 310px);
+            height: 100dvh;
+            background: var(--ts-dark);
+            z-index: 1150;
+            padding: 24px 18px;
+            display: flex;
+            flex-direction: column;
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .mobile-drawer.active {
+            left: 0;
+        }
+
+        .drawer-close {
+            align-self: flex-end;
+            background: transparent;
+            border: none;
+            color: #8ea4aa;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: clamp(20px, 3.5vw, 40px) clamp(16px, 4vw, 48px);
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: clamp(24px, 3.5vh, 32px);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--ts-dark);
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: var(--ts-gray-600);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Card Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: clamp(16px, 2.5vw, 24px);
+        }
+
+        .task-card {
+            background: white;
+            border-radius: var(--ts-radius);
+            padding: clamp(20px, 2.5vw, 26px);
+            border: 1px solid var(--ts-gray-200);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.07);
+            border-color: #cbd5e1;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+
+        .inst-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--ts-dark);
+            line-height: 1.3;
+        }
+
+        .inst-id {
+            display: inline-block;
+            background: var(--ts-gray-100);
+            color: var(--ts-gray-600);
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+
+        .date-badge {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+            border: 1px solid #dbeafe;
+        }
+
+        .location-text {
+            color: var(--ts-gray-600);
+            font-size: 13.5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+            flex-wrap: wrap;
+        }
+
+        .btn-details {
+            flex: 1;
+            min-width: 80px;
+            background: white;
+            color: var(--ts-dark);
+            border: 1px solid var(--ts-gray-200);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-details:hover {
+            background: var(--ts-gray-50);
+            border-color: var(--ts-dark);
+        }
+
+        .btn-issue {
+            flex: 1;
+            min-width: 80px;
+            background: #fff5f5;
+            color: #d93025;
+            border: 1px solid #fed7d7;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-issue:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        .btn-submit {
+            flex: 1.2;
+            min-width: 100px;
+            background: var(--ts-dark);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s ease;
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-submit:hover {
+            background: var(--ts-green);
+            color: var(--ts-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Modal / Popup CSS */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 20, 28, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 16px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 16px;
+            padding: clamp(20px, 4vw, 32px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: var(--ts-gray-100);
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--ts-gray-600);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--ts-gray-200);
+            color: var(--ts-dark);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--ts-dark);
+            border-bottom: 1px solid var(--ts-gray-200);
+            padding-bottom: 12px;
+        }
+
+        .detail-row {
+            margin-bottom: 14px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: var(--ts-gray-600);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            color: var(--ts-dark);
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .phone-highlight {
+            color: #047857;
+            background: #d1fae5;
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 6px;
+            margin-top: 4px;
+            font-weight: 700;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            background: white;
+            padding: clamp(40px, 6vw, 60px) 20px;
+            text-align: center;
+            border-radius: var(--ts-radius);
+            color: var(--ts-gray-600);
+            border: 1.5px dashed var(--ts-gray-200);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--ts-dark);
+            margin-bottom: 6px;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .main-content {
+                padding: 20px 14px 40px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-details, .btn-issue, .btn-submit {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Topbar -->
+    <header class="mobile-topbar">
+        <button class="mobile-menu-btn" id="drawerOpenBtn" aria-label="Open navigation menu">☰</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div style="width: 40px;"></div>
+    </header>
+
+    <!-- Mobile Drawer -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">INSPECTOR PORTAL</div>
+        <a href="/inspect/<%= userId %>" class="nav-item">📊 Dashboard</a>
+        <a href="/inspect/<%= userId %>/assigned" class="nav-item active">📋 Assigned Inspections</a>
+        <a href="/inspect/<%= userId %>/history" class="nav-item">📜 Inspection History</a>
+        <a href="/inspect/<%= userId %>/schedule" class="nav-item">📅 Schedule / Calendar</a>
+        <a href="/inspect/<%= userId %>/reschedule" class="nav-item">🔄 Reschedule Requests</a>
+        <a href="/api/logout/inspector" class="sidebar-logout">🚪 Log Out</a>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">INSPECTOR PORTAL</div>
+        <a href="/inspect/<%= userId %>" class="nav-item">📊 Dashboard</a>
+        <a href="/inspect/<%= userId %>/assigned" class="nav-item active">📋 Assigned Inspections</a>
+        <a href="/inspect/<%= userId %>/history" class="nav-item">📜 Inspection History</a>
+        <a href="/inspect/<%= userId %>/schedule" class="nav-item">📅 Schedule / Calendar</a>
+        <a href="/inspect/<%= userId %>/reschedule" class="nav-item">🔄 Reschedule Requests</a>
+        <a href="/api/logout/inspector" class="sidebar-logout">🚪 Log Out</a>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h1>Assigned Inspections</h1>
+                <p class="subtitle">Detailed overview and direct action triggers for all active verification assignments.</p>
+            </div>
+        </header>
+
+        <div class="card-grid">
+            <% if (tasks && tasks.length > 0) { %>
+                <% tasks.forEach(function(task, index) { %>
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div>
+                                <div class="inst-title"><%= task.type || task.instrumentName %></div>
+                                <div class="inst-id"><%= task.instrumentId %></div>
+                            </div>
+                            <div class="date-badge">
+                                📅 <%= new Date(task.scheduledDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %>
+                            </div>
+                        </div>
+
+                        <div class="location-text">
+                            📍 <%= task.address.locality %>, <%= task.address.city %>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn-details" onclick="openModal('modal-<%= index %>')">📞 Details</button>
+                            <button class="btn-issue" onclick="openModal('issue-<%= index %>')">⚠️ Issue</button>
+                            <a href="/inspect/<%= userId %>/report/<%= task._id %>" class="btn-submit">Report →</a>
+                        </div>
+                    </div>
+
+                    <!-- Details Modal -->
+                    <div id="modal-<%= index %>" class="modal-overlay" onclick="closeModalOutside(event, 'modal-<%= index %>')">
+                        <div class="modal-content">
+                            <button class="close-btn" onclick="closeModal('modal-<%= index %>')">✕</button>
+                            <h2 class="modal-title">Inspection Details</h2>
+                            
+                            <div class="detail-row">
+                                <div class="detail-label">Owner / Business Name</div>
+                                <div class="detail-value"><%= task.ownerName %></div>
+                            </div>
+
+                            <div class="detail-row">
+                                <div class="detail-label">Contact Number</div>
+                                <div class="detail-value phone-highlight">📞 <%= task.contactNumber || "Not Provided" %></div>
+                            </div>
+
+                            <div class="detail-row">
+                                <div class="detail-label">Full Address</div>
+                                <div class="detail-value">
+                                    <%= task.address.locality %><br>
+                                    <%= task.address.city %>, <%= task.address.district %><br>
+                                    <%= task.address.state %>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-row" style="margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--ts-gray-200);">
+                                <div class="detail-label">Equipment Model</div>
+                                <div class="detail-value"><%= task.company || 'N/A' %> — <%= task.modelNo || 'N/A' %></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Issue Reschedule Modal -->
+                    <div id="issue-<%= index %>" class="modal-overlay" onclick="closeModalOutside(event, 'issue-<%= index %>')">
+                        <div class="modal-content">
+                            <button class="close-btn" onclick="closeModal('issue-<%= index %>')">✕</button>
+                            <h2 class="modal-title" style="color: #d93025;">Report Field Issue</h2>
+                            <p style="font-size: 13.5px; color: var(--ts-gray-600); margin-bottom: 18px;">If you cannot complete this inspection today, notify the Administrator to reschedule.</p>
+                            
+                            <form action="/api/inspect/request-reschedule" method="POST">
+                                <input type="hidden" name="instrumentId" value="<%= task._id %>">
+                                
+                                <div style="margin-bottom: 18px;">
+                                    <label style="font-size: 12px; font-weight: 700; color: var(--ts-dark); display: block; margin-bottom: 6px;">Reason for Failure:</label>
+                                    <select name="reason" style="width: 100%; padding: 11px 14px; border: 1px solid var(--ts-gray-200); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--ts-gray-50); outline: none;">
+                                        <option value="Premises Locked / Closed">Premises Locked / Closed</option>
+                                        <option value="Owner Unreachable by Phone">Owner Unreachable by Phone</option>
+                                        <option value="Instrument Not Ready/Available">Instrument Not Ready / Available</option>
+                                        <option value="Inspector Emergency / Delay">Emergency / Delay</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" style="width: 100%; background: #d93025; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s ease;">Send to Admin for Rescheduling</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="empty-state">
+                    <h3>No Assigned Tasks</h3>
+                    <p>You do not have any pending field inspections assigned at this time.</p>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <!-- Modal & Drawer Logic -->
+    <script>
+        const drawerOpenBtn = document.getElementById('drawerOpenBtn');
+        const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerBackdrop = document.getElementById('drawerBackdrop');
+
+        function openDrawer() {
+            mobileDrawer.classList.add('active');
+            drawerBackdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            mobileDrawer.classList.remove('active');
+            drawerBackdrop.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (drawerOpenBtn) drawerOpenBtn.addEventListener('click', openDrawer);
+        if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+        if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+        function openModal(modalId) {
+            const el = document.getElementById(modalId);
+            if (el) {
+                el.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalId) {
+            const el = document.getElementById(modalId);
+            if (el) {
+                el.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeModalOutside(event, modalId) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModal(modalId);
+            }
+        }
+    </script>
+</body>
+</html>

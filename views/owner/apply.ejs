@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Apply for Verification — TrueScale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-dark: #001e2b;
+            --ts-green: #00ed64;
+            --ts-green-dark: #00684a;
+            --ts-green-light: #e8fff1;
+            --ts-gray-50: #f8fbfa;
+            --ts-gray-100: #eef3f2;
+            --ts-gray-200: #dfe7e4;
+            --ts-gray-400: #8ea4aa;
+            --ts-gray-600: #52656d;
+            --ts-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            min-height: 100dvh;
+            background-color: var(--ts-gray-50);
+            color: var(--ts-dark);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            min-height: 100dvh;
+            background-color: var(--ts-dark);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100dvh;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 36px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover .brand-icon {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        .side-title {
+            color: #5c7983;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 12px 10px 8px;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #b8c8cc;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: #08232e;
+            color: white;
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: #0b2f38;
+            color: var(--ts-green);
+            font-weight: 700;
+            box-shadow: inset 3px 0 0 var(--ts-green);
+        }
+
+        .sidebar-logout {
+            margin-top: auto;
+            color: #ff6b6b;
+            padding: 12px 16px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-logout:hover {
+            background: rgba(255, 107, 107, 0.12);
+            color: #ff8585;
+        }
+
+        /* Mobile Topbar & Drawer */
+        .mobile-topbar {
+            display: none;
+            height: 64px;
+            background: var(--ts-dark);
+            color: white;
+            padding: 0 18px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .mobile-topbar .brand {
+            margin-bottom: 0;
+            font-size: 19px;
+            gap: 10px;
+        }
+
+        .mobile-topbar .brand-icon {
+            width: 34px;
+            height: 34px;
+        }
+
+        .mobile-menu-btn {
+            background: #082833;
+            border: 1px solid #14404f;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .drawer-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 20, 28, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1100;
+        }
+
+        .drawer-backdrop.active {
+            display: block;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: min(80vw, 300px);
+            height: 100dvh;
+            background: var(--ts-dark);
+            z-index: 1150;
+            padding: 24px 18px;
+            display: flex;
+            flex-direction: column;
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .mobile-drawer.active {
+            left: 0;
+        }
+
+        .drawer-close {
+            align-self: flex-end;
+            background: transparent;
+            border: none;
+            color: #8ea4aa;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: clamp(20px, 4vw, 40px) clamp(16px, 5vw, 60px);
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        .header {
+            margin-bottom: clamp(20px, 4vh, 32px);
+        }
+
+        .header h1 {
+            font-size: clamp(24px, 3vw, 32px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--ts-dark);
+        }
+
+        /* Modern Form Container */
+        .form-container {
+            background: white;
+            padding: clamp(24px, 4vw, 44px);
+            border-radius: var(--ts-radius);
+            border: 1px solid var(--ts-gray-200);
+            max-width: 900px;
+            box-shadow: 0 10px 30px rgba(0, 30, 43, 0.03);
+            margin-bottom: 40px;
+        }
+
+        .form-header {
+            margin-bottom: 28px;
+            border-bottom: 1px solid var(--ts-gray-200);
+            padding-bottom: 18px;
+        }
+
+        .form-header h2 {
+            font-size: clamp(20px, 2.5vw, 24px);
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: var(--ts-dark);
+        }
+
+        .form-header p {
+            color: var(--ts-gray-600);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--ts-dark);
+            margin: 28px 0 14px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: "";
+            display: block;
+            width: 5px;
+            height: 18px;
+            background: var(--ts-green);
+            border-radius: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #3b5058;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px;
+            border: 1.5px solid var(--ts-gray-200);
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+            background: #fcfdfd;
+            color: var(--ts-dark);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--ts-green);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 237, 100, 0.15);
+        }
+
+        /* OTP Specific UI */
+        .otp-container {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-otp {
+            height: 48px;
+            padding: 0 18px;
+            background: #e8f0fe;
+            color: #1a73e8;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-otp:hover {
+            background: #d2e3fc;
+        }
+
+        .btn-otp.verified {
+            background: var(--ts-green-light);
+            color: var(--ts-green-dark);
+            border: 1px solid #b9f5d0;
+            pointer-events: none;
+        }
+
+        #otp-input-group {
+            display: none;
+            margin-top: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Checkout Section */
+        .checkout-section {
+            margin-top: 36px;
+            padding-top: 24px;
+            border-top: 1px solid var(--ts-gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .fee-amount {
+            font-size: 14px;
+            color: var(--ts-gray-600);
+        }
+
+        .fee-amount strong {
+            font-size: clamp(22px, 3vw, 28px);
+            color: var(--ts-dark);
+            font-weight: 900;
+            margin-left: 6px;
+        }
+
+        .btn-pay {
+            padding: 14px 28px;
+            background-color: var(--ts-dark);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 14px rgba(0, 30, 43, 0.2);
+        }
+
+        .btn-pay:hover {
+            background-color: #00384a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 30, 43, 0.25);
+        }
+
+        .btn-pay span {
+            color: var(--ts-green);
+        }
+
+        /* Mobile Media Query */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .main-content {
+                padding: 20px 16px 40px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+            .checkout-section {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .btn-pay {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Topbar -->
+    <header class="mobile-topbar">
+        <button class="mobile-menu-btn" id="drawerOpenBtn" aria-label="Open menu">☰</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <a href="/owner/<%= userId %>" style="color: var(--ts-green); font-size: 13px; font-weight: 700; text-decoration: none;">Dashboard</a>
+    </header>
+
+    <!-- Mobile Drawer -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">OWNER PORTAL</div>
+        <a href="/owner/<%= userId %>" class="nav-item">📊 Dashboard</a>
+        <a href="/owner/<%= userId %>/instruments" class="nav-item">⚖️ My Instruments</a>
+        <a href="/owner/<%= userId %>/apply" class="nav-item active">📝 Apply for Verification</a>
+        <a href="/owner/<%= userId %>/status" class="nav-item">⏱️ Application Status</a>
+        <a href="/owner/<%= userId %>/due-verifications" class="nav-item">🔔 Due Verifications</a>
+        <a href="/owner/<%= userId %>/certificates" class="nav-item">📜 Certificates</a>
+        <a id="mobile-sidebar-logout-btn" class="sidebar-logout">🚪 Log Out</a>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">OWNER PORTAL</div>
+        <a href="/owner/<%= userId %>" class="nav-item">📊 Dashboard</a>
+        <a href="/owner/<%= userId %>/instruments" class="nav-item">⚖️ My Instruments</a>
+        <a href="/owner/<%= userId %>/apply" class="nav-item active">📝 Apply for Verification</a>
+        <a href="/owner/<%= userId %>/status" class="nav-item">⏱️ Application Status</a>
+        <a href="/owner/<%= userId %>/due-verifications" class="nav-item">🔔 Due Verifications</a>
+        <a href="/owner/<%= userId %>/certificates" class="nav-item">📜 Certificates</a>
+        <a id="sidebar-logout-btn" class="sidebar-logout">🚪 Log Out</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>New Application</h1>
+        </header>
+
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Register & Verify Instrument</h2>
+                <p>Please provide accurate details. Your inspector will use this information during the physical field visit.</p>
+            </div>
+
+            <form action="/api/instruments" method="POST" id="applicationForm">
+                <div id="recaptcha-container"></div>
+
+                <!-- SECTION 1: Owner Details -->
+                <h3 class="section-title">Owner Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Owner / Business Name</label>
+                        <input type="text" name="ownerName" placeholder="Enter full legal name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contact Number</label>
+                        <div class="otp-container">
+                            <input type="tel" name="contactNumber" id="phone" value="+91 " placeholder="+91 XXXXX XXXXX" required>
+                            <button type="button" class="btn-otp" id="sendOtpBtn">Send OTP</button>
+                        </div>
+                        <div class="otp-container" id="otp-input-group">
+                            <input type="text" id="otpCode" placeholder="Enter 4-digit OTP (2446)" maxlength="6">
+                            <button type="button" class="btn-otp" id="verifyOtpBtn" style="background:#001e2b; color:white;">Verify</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Address Details -->
+                <h3 class="section-title">Location Details (For Physical Inspection)</h3>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Locality / Street Address</label>
+                        <input type="text" name="locality" placeholder="Shop No, Building, Street Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City / Town</label>
+                        <input type="text" name="city" placeholder="e.g. New Delhi" required>
+                    </div>
+                    <div class="form-group">
+                        <label>District</label>
+                        <input type="text" name="district" placeholder="e.g. South Delhi" required>
+                    </div>
+                    <div class="form-group">
+                        <label>State</label>
+                        <select name="state" required>
+                            <option value="" disabled selected>Select State</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Gujarat">Gujarat</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Instrument Details -->
+                <h3 class="section-title">Instrument Specifications</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Instrument Type</label>
+                        <select name="type" required>
+                            <option value="" disabled selected>Select Type</option>
+                            <option value="Industrial Scale">Industrial Scale (Above 50kg)</option>
+                            <option value="Retail Scale">Retail Scale (Kirana/Shop)</option>
+                            <option value="Weighbridge">Weighbridge (Trucks)</option>
+                            <option value="Medical Scale">Medical / Precision Scale</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Instrument Name / Alias</label>
+                        <input type="text" name="instrumentName" placeholder="e.g. Main Shop Counter Scale" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Manufacturing Company</label>
+                        <input type="text" name="company" placeholder="e.g. Avery India, Essae" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Model Number</label>
+                        <input type="text" name="modelNo" placeholder="e.g. DS-852" required>
+                    </div>
+                    <input type="hidden" name="instrumentId" id="generatedInstrumentId">
+                </div>
+
+                <!-- SECTION 4: Checkout -->
+                <div class="checkout-section">
+                    <div class="fee-amount">Verification Fee: <strong>₹ 500.00</strong></div>
+                    <button type="submit" class="btn-pay">
+                        Pay Fees & Submit <span>→</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const drawerOpenBtn = document.getElementById('drawerOpenBtn');
+        const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerBackdrop = document.getElementById('drawerBackdrop');
+
+        function openDrawer() {
+            mobileDrawer.classList.add('active');
+            drawerBackdrop.classList.add('active');
+        }
+
+        function closeDrawer() {
+            mobileDrawer.classList.remove('active');
+            drawerBackdrop.classList.remove('active');
+        }
+
+        if (drawerOpenBtn) drawerOpenBtn.addEventListener('click', openDrawer);
+        if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+        if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+    </script>
+
+    <!-- UI Logic for Fake OTP and ID Generation -->
+    <script id="firebase-config" type="application/json"><%- JSON.stringify(firebaseConfig) %></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const configText = document.getElementById('firebase-config').textContent;
+        const app = initializeApp(JSON.parse(configText));
+        const auth = getAuth(app);
+
+        const handleLogout = () => {
+            signOut(auth).then(() => {
+                document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                window.location.href = '/login';
+            });
+        };
+
+        const sidebarBtn = document.getElementById('sidebar-logout-btn');
+        const mobileSidebarBtn = document.getElementById('mobile-sidebar-logout-btn');
+        if (sidebarBtn) sidebarBtn.addEventListener('click', handleLogout);
+        if (mobileSidebarBtn) mobileSidebarBtn.addEventListener('click', handleLogout);
+
+        const sendOtpBtn = document.getElementById('sendOtpBtn');
+        const otpGroup = document.getElementById('otp-input-group');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+        const phoneInput = document.getElementById('phone');
+
+        sendOtpBtn.addEventListener('click', () => {
+            const phoneNumber = phoneInput.value.replace(/\s+/g, '');
+
+            if (!phoneNumber.startsWith('+') || phoneNumber.length < 12) {
+                return alert("Please enter a valid 10-digit phone number with country code.");
+            }
+
+            sendOtpBtn.textContent = "Sending...";
+
+            setTimeout(() => {
+                sendOtpBtn.textContent = "OTP Sent!";
+                otpGroup.style.display = "flex";
+            }, 500);
+        });
+
+        verifyOtpBtn.addEventListener('click', () => {
+            const code = document.getElementById('otpCode').value;
+            verifyOtpBtn.textContent = "Checking...";
+
+            setTimeout(() => {
+                if (code === '2446') {
+                    otpGroup.style.display = "none";
+                    sendOtpBtn.textContent = "✓ Verified";
+                    sendOtpBtn.classList.add('verified');
+                    phoneInput.readOnly = true;
+                    phoneInput.style.backgroundColor = "#e8fff1";
+                } else {
+                    alert("Invalid OTP code. Please use the dummy code: 2446");
+                    verifyOtpBtn.textContent = "Verify";
+                }
+            }, 500);
+        });
+
+        document.getElementById('applicationForm').addEventListener('submit', (e) => {
+            const randomId = 'INS-' + Math.floor(10000 + Math.random() * 90000);
+            document.getElementById('generatedInstrumentId').value = randomId;
+
+            if (!sendOtpBtn.classList.contains('verified')) {
+                e.preventDefault();
+                alert("Please verify your phone number using the OTP before submitting.");
+            }
+        });
+    </script>
+</body>
+</html>

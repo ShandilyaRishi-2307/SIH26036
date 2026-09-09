@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Inspector Dashboard — TrueScale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-dark: #001e2b;
+            --ts-dark-surface: #072734;
+            --ts-green: #00ed64;
+            --ts-green-dark: #00684a;
+            --ts-green-light: #e8fff1;
+            --ts-gray-50: #f8fafc;
+            --ts-gray-100: #f1f5f9;
+            --ts-gray-200: #e2e8f0;
+            --ts-gray-400: #94a3b8;
+            --ts-gray-600: #475569;
+            --ts-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            min-height: 100dvh;
+            background-color: var(--ts-gray-50);
+            color: var(--ts-dark);
+            overflow-x: hidden;
+        }
+
+        /* Desktop Sidebar */
+        .sidebar {
+            width: 260px;
+            min-height: 100dvh;
+            background: var(--ts-dark);
+            color: white;
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100dvh;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 32px;
+            color: white;
+            text-decoration: none;
+            padding: 0 6px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover .brand-icon {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        .side-title {
+            color: #5c7983;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 10px 8px 6px;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #b8c8cc;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: #08232e;
+            color: white;
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: #123d48;
+            color: var(--ts-green);
+            font-weight: 700;
+            box-shadow: inset 3px 0 0 var(--ts-green);
+        }
+
+        .sidebar-logout {
+            margin-top: auto;
+            color: #ff6b6b;
+            padding: 12px 14px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-logout:hover {
+            background: rgba(255, 107, 107, 0.12);
+            color: #ff8585;
+        }
+
+        /* Mobile Topbar & Drawer */
+        .mobile-topbar {
+            display: none;
+            height: 64px;
+            background: var(--ts-dark);
+            color: white;
+            padding: 0 16px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .mobile-topbar .brand {
+            margin-bottom: 0;
+            font-size: 18px;
+            padding: 0;
+        }
+
+        .mobile-topbar .brand-icon {
+            width: 34px;
+            height: 34px;
+        }
+
+        .mobile-menu-btn {
+            background: #082833;
+            border: 1px solid #14404f;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .drawer-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 20, 28, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1100;
+        }
+
+        .drawer-backdrop.active {
+            display: block;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: min(82vw, 310px);
+            height: 100dvh;
+            background: var(--ts-dark);
+            z-index: 1150;
+            padding: 24px 18px;
+            display: flex;
+            flex-direction: column;
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .mobile-drawer.active {
+            left: 0;
+        }
+
+        .drawer-close {
+            align-self: flex-end;
+            background: transparent;
+            border: none;
+            color: #8ea4aa;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: clamp(20px, 3.5vw, 40px) clamp(16px, 4vw, 48px);
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: clamp(24px, 3.5vh, 32px);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--ts-dark);
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: var(--ts-gray-600);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ts-dark);
+            background: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid var(--ts-gray-200);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+
+        .user-icon {
+            background: var(--ts-dark);
+            color: var(--ts-green);
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        /* Metrics Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: clamp(14px, 2vw, 22px);
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: var(--ts-radius);
+            padding: clamp(18px, 2.5vw, 24px);
+            border: 1px solid var(--ts-gray-200);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--ts-green);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .metric-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--ts-gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+
+        .metric-value {
+            font-size: clamp(28px, 3.5vw, 36px);
+            font-weight: 900;
+            color: var(--ts-dark);
+            line-height: 1;
+        }
+
+        /* Table Section */
+        .table-section {
+            background: white;
+            border-radius: var(--ts-radius);
+            border: 1px solid var(--ts-gray-200);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+        }
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--ts-gray-200);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--ts-dark);
+        }
+
+        .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 9px 14px;
+            border: 1px solid var(--ts-gray-200);
+            border-radius: 8px 0 0 8px;
+            font-size: 13px;
+            outline: none;
+            width: clamp(140px, 20vw, 220px);
+            background: var(--ts-gray-50);
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            background: white;
+            border-color: var(--ts-dark);
+        }
+
+        .search-btn {
+            background: var(--ts-dark);
+            border: 1px solid var(--ts-dark);
+            padding: 9px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-btn:hover {
+            background: #082833;
+        }
+
+        .filter-select {
+            padding: 9px 14px;
+            border: 1px solid var(--ts-gray-200);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ts-dark);
+            outline: none;
+            background: white;
+            cursor: pointer;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 680px;
+        }
+
+        th {
+            background: var(--ts-gray-50);
+            color: var(--ts-gray-600);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--ts-gray-200);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--ts-gray-100);
+            font-size: 13.5px;
+            color: var(--ts-dark);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-scheduled {
+            color: #1d4ed8;
+            background: #dbeafe;
+        }
+
+        .status-pending {
+            color: #b45309;
+            background: #fef3c7;
+        }
+
+        .status-awaiting {
+            color: #6d28d9;
+            background: #ede9fe;
+        }
+
+        .status-approved {
+            color: #047857;
+            background: #d1fae5;
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            background: var(--ts-dark);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 12.5px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            min-height: 36px;
+        }
+
+        .btn-action:hover {
+            background: #00ed64;
+            color: var(--ts-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-disabled {
+            background: var(--ts-gray-100);
+            color: var(--ts-gray-400);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--ts-gray-200);
+            cursor: not-allowed;
+            white-space: nowrap;
+            min-height: 36px;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .main-content {
+                padding: 20px 14px 40px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .user-profile {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .filter-select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Topbar -->
+    <header class="mobile-topbar">
+        <button class="mobile-menu-btn" id="drawerOpenBtn" aria-label="Open navigation menu">☰</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div style="width: 40px;"></div>
+    </header>
+
+    <!-- Mobile Drawer -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">INSPECTOR PORTAL</div>
+        <a href="/inspect/<%= userId %>" class="nav-item active">📊 Dashboard</a>
+        <a href="/inspect/<%= userId %>/assigned" class="nav-item">📋 Assigned Inspections</a>
+        <a href="/inspect/<%= userId %>/history" class="nav-item">📜 Inspection History</a>
+        <a href="/inspect/<%= userId %>/schedule" class="nav-item">📅 Schedule / Calendar</a>
+        <a href="/inspect/<%= userId %>/reschedule" class="nav-item">🔄 Reschedule Requests</a>
+        <a href="/api/logout/inspector" class="sidebar-logout">🚪 Log Out</a>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">INSPECTOR PORTAL</div>
+        <a href="/inspect/<%= userId %>" class="nav-item active">📊 Dashboard</a>
+        <a href="/inspect/<%= userId %>/assigned" class="nav-item">📋 Assigned Inspections</a>
+        <a href="/inspect/<%= userId %>/history" class="nav-item">📜 Inspection History</a>
+        <a href="/inspect/<%= userId %>/schedule" class="nav-item">📅 Schedule / Calendar</a>
+        <a href="/inspect/<%= userId %>/reschedule" class="nav-item">🔄 Reschedule Requests</a>
+        <a href="/api/logout/inspector" class="sidebar-logout">🚪 Log Out</a>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h1>Inspector Dashboard</h1>
+                <p class="subtitle">Review, conduct and record verification inspections assigned to you.</p>
+            </div>
+            <div class="user-profile">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="user-icon"><%= userEmail.charAt(0).toUpperCase() %></div>
+                    <span><%= userEmail %></span>
+                </div>
+            </div>
+        </header>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">ASSIGNED INSPECTIONS</div>
+                <div class="metric-value"><%= metrics.assigned %></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">PENDING REPORTS</div>
+                <div class="metric-value"><%= metrics.pending %></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">COMPLETED THIS MONTH</div>
+                <div class="metric-value"><%= metrics.completed %></div>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <div class="table-toolbar">
+                <div class="table-title">Assigned Inspections</div>
+                <div class="toolbar-actions">
+                    <div class="search-box">
+                        <input type="text" id="taskSearchInput" class="search-input" placeholder="Search ID (e.g. INS-8832)">
+                        <button class="search-btn" id="taskSearchBtn">Search</button>
+                    </div>
+                    <select class="filter-select" id="statusFilterSelect">
+                        <option value="all">All Statuses</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="inspectionsTable">
+                    <thead>
+                        <tr>
+                            <th>APPLICATION ID</th>
+                            <th>INSTRUMENT</th>
+                            <th>OWNER</th>
+                            <th>SCHEDULED DATE</th>
+                            <th>LOCATION</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (tasks && tasks.length > 0) { %>
+                            <% tasks.forEach(function(task) { 
+                                let statusClass = '';
+                                let displayStatus = task.status;
+                                let isActionable = false;
+
+                                if (task.status === 'Inspector Assigned') {
+                                    if (new Date(task.scheduledDate) <= new Date().setHours(0,0,0,0)) {
+                                        statusClass = 'status-pending';
+                                        displayStatus = 'Pending Inspection';
+                                        isActionable = true;
+                                    } else {
+                                        statusClass = 'status-scheduled';
+                                        displayStatus = 'Scheduled';
+                                        isActionable = true;
+                                    }
+                                } else if (task.status === 'Document Approved') {
+                                    statusClass = 'status-awaiting';
+                                    displayStatus = 'Awaiting Admin Approval';
+                                } else if (task.status === 'Certificate Generated') {
+                                    statusClass = 'status-approved';
+                                    displayStatus = 'Completed';
+                                }
+                            %>
+                                <tr>
+                                    <td style="font-family: monospace; font-weight: 700;"><%= task.instrumentId %></td>
+                                    <td><strong><%= task.type || task.instrumentName %></strong></td>
+                                    <td><%= task.ownerName %></td>
+                                    <td><%= new Date(task.scheduledDate).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) %></td>
+                                    <td><%= task.address.locality %>, <%= task.address.city %></td>
+                                    <td><span class="status-badge <%= statusClass %>"><%= displayStatus %></span></td>
+                                    <td>
+                                        <% if (isActionable) { %>
+                                            <a href="/inspect/<%= userId %>/report/<%= task._id %>" class="btn-action">Submit Report</a>
+                                        <% } else { %>
+                                            <span class="btn-disabled">Submitted</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px; color: var(--ts-gray-600);">No tasks currently assigned to you.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Drawer & Search Filter Script -->
+    <script>
+        const drawerOpenBtn = document.getElementById('drawerOpenBtn');
+        const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerBackdrop = document.getElementById('drawerBackdrop');
+
+        function openDrawer() {
+            mobileDrawer.classList.add('active');
+            drawerBackdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            mobileDrawer.classList.remove('active');
+            drawerBackdrop.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (drawerOpenBtn) drawerOpenBtn.addEventListener('click', openDrawer);
+        if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+        if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+        // Search and filter client-side enhancement
+        const searchInput = document.getElementById('taskSearchInput');
+        const searchBtn = document.getElementById('taskSearchBtn');
+        const statusFilter = document.getElementById('statusFilterSelect');
+        const tableRows = document.querySelectorAll('#inspectionsTable tbody tr');
+
+        function filterTable() {
+            const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+            const filter = statusFilter ? statusFilter.value.toLowerCase() : 'all';
+
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const matchesQuery = !query || text.includes(query);
+                let matchesStatus = true;
+
+                if (filter !== 'all') {
+                    matchesStatus = text.includes(filter);
+                }
+
+                row.style.display = (matchesQuery && matchesStatus) ? '' : 'none';
+            });
+        }
+
+        if (searchInput) searchInput.addEventListener('input', filterTable);
+        if (searchBtn) searchBtn.addEventListener('click', filterTable);
+        if (statusFilter) statusFilter.addEventListener('change', filterTable);
+    </script>
+</body>
+</html>

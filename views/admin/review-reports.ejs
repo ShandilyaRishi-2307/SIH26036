@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Approve Documents — TrueScale Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-bg: #00121a;
+            --ts-dark: #001e2b;
+            --ts-surface: #042633;
+            --ts-border: #0c3845;
+            --ts-green: #00ed64;
+            --ts-green-dark: #00684a;
+            --ts-text: #f8fbfa;
+            --ts-muted: #81989f;
+            --ts-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            min-height: 100dvh;
+            background-color: var(--ts-bg);
+            color: var(--ts-text);
+            overflow-x: hidden;
+        }
+
+        /* Desktop Sidebar */
+        .sidebar {
+            width: 260px;
+            min-height: 100dvh;
+            background: var(--ts-dark);
+            border-right: 1px solid var(--ts-border);
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100dvh;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 32px;
+            text-decoration: none;
+            padding: 0 6px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover .brand-icon {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        .badge-admin {
+            background: var(--ts-green);
+            color: var(--ts-dark);
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .side-title {
+            color: #5c7983;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 10px 8px 6px;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--ts-muted);
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--ts-surface);
+            color: white;
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: var(--ts-surface);
+            color: var(--ts-green);
+            font-weight: 700;
+            box-shadow: inset 3px 0 0 var(--ts-green);
+        }
+
+        .sidebar-logout {
+            margin-top: auto;
+            color: #ff6b6b;
+            padding: 12px 14px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-logout:hover {
+            background: rgba(255, 107, 107, 0.12);
+            color: #ff8585;
+        }
+
+        /* Mobile Topbar & Drawer */
+        .mobile-topbar {
+            display: none;
+            height: 64px;
+            background: var(--ts-dark);
+            border-bottom: 1px solid var(--ts-border);
+            color: white;
+            padding: 0 16px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .mobile-topbar .brand {
+            margin-bottom: 0;
+            font-size: 18px;
+            padding: 0;
+        }
+
+        .mobile-topbar .brand-icon {
+            width: 34px;
+            height: 34px;
+        }
+
+        .mobile-menu-btn {
+            background: var(--ts-surface);
+            border: 1px solid var(--ts-border);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .drawer-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 10, 15, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1100;
+        }
+
+        .drawer-backdrop.active {
+            display: block;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: min(82vw, 310px);
+            height: 100dvh;
+            background: var(--ts-dark);
+            z-index: 1150;
+            padding: 24px 18px;
+            display: flex;
+            flex-direction: column;
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
+            border-right: 1px solid var(--ts-border);
+        }
+
+        .mobile-drawer.active {
+            left: 0;
+        }
+
+        .drawer-close {
+            align-self: flex-end;
+            background: transparent;
+            border: none;
+            color: var(--ts-muted);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: clamp(24px, 4vw, 50px) clamp(18px, 5vw, 60px);
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        .header {
+            margin-bottom: clamp(28px, 4vh, 40px);
+            border-bottom: 1px solid var(--ts-border);
+            padding-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: clamp(24px, 3.5vw, 32px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: var(--ts-muted);
+            font-size: 14.5px;
+        }
+
+        /* Report Cards */
+        .report-grid {
+            display: grid;
+            gap: clamp(20px, 3vw, 32px);
+            max-width: 980px;
+        }
+
+        .report-card {
+            background: var(--ts-dark);
+            border: 1px solid var(--ts-border);
+            border-radius: var(--ts-radius);
+            padding: clamp(20px, 3vw, 32px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--ts-border);
+            padding-bottom: 18px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .inspector-tag {
+            background: var(--ts-surface);
+            color: #38bdf8;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--ts-border);
+            white-space: nowrap;
+        }
+
+        .report-details {
+            background: var(--ts-bg);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--ts-border);
+        }
+
+        .report-details p {
+            color: var(--ts-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .outcome-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .outcome-pass {
+            background: rgba(0, 237, 100, 0.12);
+            color: var(--ts-green);
+            border: 1px solid rgba(0, 237, 100, 0.3);
+        }
+
+        .outcome-fail {
+            background: rgba(255, 71, 87, 0.12);
+            color: #ff8585;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        /* Image Gallery */
+        .image-gallery {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .image-gallery img {
+            width: 88px;
+            height: 88px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1.5px solid var(--ts-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .image-gallery img:hover {
+            transform: scale(1.06);
+            border-color: var(--ts-green);
+        }
+
+        /* Approval Actions */
+        .action-form {
+            display: flex;
+            gap: 12px;
+            background: var(--ts-surface);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--ts-border);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .action-form input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--ts-border);
+            background: var(--ts-bg);
+            color: white;
+            outline: none;
+            font-size: 13.5px;
+            font-family: inherit;
+        }
+
+        .action-form input:focus {
+            border-color: var(--ts-green);
+        }
+
+        .btn-approve {
+            background: var(--ts-green);
+            color: var(--ts-dark);
+            font-weight: 800;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13.5px;
+            white-space: nowrap;
+            min-height: 44px;
+        }
+
+        .btn-approve:hover {
+            background: #00d957;
+            transform: translateY(-1px);
+        }
+
+        .btn-reject {
+            background: transparent;
+            color: #ff6b6b;
+            font-weight: 700;
+            padding: 12px 18px;
+            border: 1px solid rgba(255, 107, 107, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13.5px;
+            white-space: nowrap;
+            min-height: 44px;
+        }
+
+        .btn-reject:hover {
+            background: rgba(255, 107, 107, 0.12);
+            border-color: #ff6b6b;
+        }
+
+        .empty-state {
+            background: var(--ts-dark);
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: var(--ts-radius);
+            border: 1.5px dashed var(--ts-border);
+            color: var(--ts-muted);
+            max-width: 980px;
+        }
+
+        /* Lightbox Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 10, 15, 0.9);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            max-width: 92%;
+            max-height: 85vh;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--ts-border);
+            object-fit: contain;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            color: var(--ts-muted);
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #ff4757;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .main-content {
+                padding: 24px 16px 40px;
+            }
+
+            .action-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-form input, .btn-reject, .btn-approve {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Topbar -->
+    <header class="mobile-topbar">
+        <button class="mobile-menu-btn" id="drawerOpenBtn" aria-label="Open navigation menu">☰</button>
+        <a href="/admin/dashboard" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+            <span class="badge-admin">ADMIN</span>
+        </a>
+        <div style="width: 40px;"></div>
+    </header>
+
+    <!-- Mobile Drawer -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+        <a href="/admin/dashboard" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+            <span class="badge-admin">ADMIN</span>
+        </a>
+        <div class="side-title">COMMAND CENTER</div>
+        <a href="/admin/dashboard" class="nav-item">📊 Dashboard</a>
+        <a href="/admin/assign-inspector" class="nav-item">📌 Assign Inspector</a>
+        <a href="/admin/review-reports" class="nav-item active">📝 Approve Documents</a>
+        <a href="/admin/history" class="nav-item">📜 System History</a>
+        <a href="/admin/reschedule-requests" class="nav-item">⚠️ Reschedule Queue</a>
+        <a href="/admin/logout" class="sidebar-logout">🚪 Log Out</a>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="sidebar">
+        <a href="/admin/dashboard" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+            <span class="badge-admin">ADMIN</span>
+        </a>
+        <div class="side-title">COMMAND CENTER</div>
+        <a href="/admin/dashboard" class="nav-item">📊 Dashboard</a>
+        <a href="/admin/assign-inspector" class="nav-item">📌 Assign Inspector</a>
+        <a href="/admin/review-reports" class="nav-item active">📝 Approve Documents</a>
+        <a href="/admin/history" class="nav-item">📜 System History</a>
+        <a href="/admin/reschedule-requests" class="nav-item">⚠️ Reschedule Queue</a>
+        <a href="/admin/logout" class="sidebar-logout">🚪 Log Out</a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <h1>Review Field Reports</h1>
+            <p class="subtitle">Review submitted inspector diagnostics, verify evidence photos, and authorize digital verification certificates.</p>
+        </header>
+
+        <div class="report-grid">
+            <% if (reports && reports.length > 0) { %>
+                <% reports.forEach(report => { %>
+                    <div class="report-card">
+                        <div class="card-header">
+                            <div>
+                                <h2><%= report.instrument.instrumentName || report.instrument.type %></h2>
+                                <p style="color: var(--ts-muted); font-size: 14px;">ID: <strong style="color: white; font-family: monospace;"><%= report.instrument.instrumentId %></strong> | Owner: <strong style="color: white;"><%= report.instrument.ownerName %></strong></p>
+                            </div>
+                            <div class="inspector-tag">
+                                👤 Inspector: <%= report.inspector.name %>
+                            </div>
+                        </div>
+
+                        <div class="report-details">
+                            <% if (report.isGoodToUse === 'Yes') { %>
+                                <div class="outcome-badge outcome-pass">✓ INSPECTOR ASSESSMENT: COMPLIANT</div>
+                            <% } else { %>
+                                <div class="outcome-badge outcome-fail">⚠️ INSPECTOR ASSESSMENT: NON-COMPLIANT</div>
+                            <% } %>
+                            <p><strong style="color: white;">Field Analysis Remarks:</strong><br> <%= report.analysisReport %></p>
+                        </div>
+
+                        <div style="font-size: 12px; color: var(--ts-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 10px;">Photographic Evidence:</div>
+                        <div class="image-gallery">
+                            <% if (report.testOutcomes && report.testOutcomes.length > 0) { %>
+                                <% report.testOutcomes.forEach(img => { %>
+                                    <img src="<%= img %>" onclick="openLightbox('<%= img %>')" alt="Evidence Photo" title="Click to view full photo">
+                                <% }) %>
+                            <% } else { %>
+                                <span style="color: #ff6b6b; font-size: 13px;">No photographic evidence attached.</span>
+                            <% } %>
+                        </div>
+
+                        <form action="/api/admin/process-report" method="POST" class="action-form">
+                            <input type="hidden" name="instrumentId" value="<%= report.instrument._id %>">
+                            <input type="text" name="rejectionMessage" placeholder="Reason (Required only if rejecting)">
+                            <button type="submit" name="action" value="Reject" class="btn-reject">Reject Report</button>
+                            <button type="submit" name="action" value="Approve" class="btn-approve">Approve & Issue Certificate →</button>
+                        </form>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="empty-state">
+                    <div style="font-size: 36px; margin-bottom: 12px;">✓</div>
+                    <h3 style="color: white; margin-bottom: 6px; font-size: 18px;">All Reports Processed</h3>
+                    <p>No submitted field reports currently awaiting admin review and certificate approval.</p>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <!-- Lightbox Modal -->
+    <div id="imageModal" class="modal" onclick="closeLightbox()">
+        <span class="close-btn">&times;</span>
+        <img class="modal-content" id="modalImg" onclick="event.stopPropagation()" alt="Full Size Evidence">
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        const drawerOpenBtn = document.getElementById('drawerOpenBtn');
+        const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerBackdrop = document.getElementById('drawerBackdrop');
+
+        function openDrawer() {
+            mobileDrawer.classList.add('active');
+            drawerBackdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            mobileDrawer.classList.remove('active');
+            drawerBackdrop.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (drawerOpenBtn) drawerOpenBtn.addEventListener('click', openDrawer);
+        if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+        if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+        // Lightbox Functions
+        function openLightbox(imageSrc) {
+            document.getElementById('imageModal').style.display = 'flex';
+            document.getElementById('modalImg').src = imageSrc;
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('imageModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    </script>
+</body>
+</html>

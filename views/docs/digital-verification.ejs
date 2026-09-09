@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Digital Verification Workflow — TrueScale Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --ts-dark: #001e2b;
+            --ts-green: #00ed64;
+            --ts-green-dark: #00684a;
+            --ts-green-light: #e8fff1;
+            --ts-gray-50: #f8fafc;
+            --ts-gray-100: #f1f5f9;
+            --ts-gray-200: #e2e8f0;
+            --ts-gray-600: #475569;
+            --ts-radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--ts-gray-50);
+            color: var(--ts-dark);
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        header {
+            background: white;
+            border-bottom: 1px solid var(--ts-gray-200);
+            padding: 0 clamp(16px, 5vw, 48px);
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--ts-dark);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .logo-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--ts-gray-600);
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--ts-dark);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-nav {
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--ts-dark);
+            border: 1px solid var(--ts-gray-200);
+        }
+
+        .btn-outline:hover {
+            background: var(--ts-gray-100);
+        }
+
+        .btn-primary {
+            background: var(--ts-dark);
+            color: white;
+            border: 1px solid var(--ts-dark);
+        }
+
+        .btn-primary:hover {
+            background: #003043;
+        }
+
+        /* Container */
+        .verification-section {
+            width: min(94%, 960px);
+            margin: clamp(20px, 4vw, 40px) auto;
+            background: white;
+            border: 1px solid var(--ts-gray-200);
+            border-radius: var(--ts-radius);
+            padding: clamp(30px, 5vw, 60px) clamp(18px, 4vw, 44px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            position: relative;
+        }
+
+        .heading {
+            text-align: center;
+            margin-bottom: clamp(32px, 5vw, 50px);
+        }
+
+        .heading h1 {
+            font-size: clamp(26px, 4vw, 40px);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: var(--ts-dark);
+            margin-bottom: 12px;
+        }
+
+        .heading p {
+            font-size: clamp(15px, 2vw, 18px);
+            color: var(--ts-gray-600);
+            line-height: 1.55;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Vertical Stepper */
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .steps::before {
+            content: "";
+            position: absolute;
+            left: 48px;
+            top: 40px;
+            bottom: 40px;
+            border-left: 2px dashed #a7f3d0;
+            z-index: 1;
+        }
+
+        .step-card {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid var(--ts-gray-200);
+            border-radius: var(--ts-radius);
+            padding: clamp(16px, 2.5vw, 24px) clamp(16px, 3vw, 28px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            position: relative;
+            z-index: 2;
+            transition: all 0.25s ease;
+            gap: 20px;
+            cursor: pointer;
+        }
+
+        .step-card:hover {
+            transform: translateX(6px);
+            box-shadow: 0 10px 28px rgba(0, 237, 100, 0.12);
+            border-color: var(--ts-green);
+        }
+
+        .icon-box {
+            width: 64px;
+            height: 64px;
+            background: var(--ts-green-light);
+            border: 1.5px solid #c7f3d6;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--ts-green-dark);
+            font-size: 26px;
+        }
+
+        .step-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .step-content h2 {
+            font-size: clamp(16px, 2vw, 19px);
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: var(--ts-dark);
+        }
+
+        .step-content p {
+            font-size: 13.5px;
+            color: var(--ts-gray-600);
+            line-height: 1.5;
+        }
+
+        .step-number {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--ts-dark);
+            background: var(--ts-gray-100);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .step-card:hover .step-number {
+            background: var(--ts-dark);
+            color: var(--ts-green);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 800px) {
+            nav {
+                display: none;
+            }
+
+            .steps::before {
+                display: none;
+            }
+
+            .step-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+
+            .step-card:hover {
+                transform: translateY(-3px);
+            }
+
+            .step-number {
+                align-self: flex-end;
+                margin-top: -30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header -->
+    <header>
+        <a href="/" class="logo">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="logo-img">
+            <span>TrueScale</span>
+        </a>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/docs/digital-certificate">Certificate Flow</a>
+            <a href="/docs/digital-verification" class="active">Digital Verification</a>
+            <a href="/docs/inspector-assignment">Inspector Dispatch</a>
+            <a href="/docs/qr-verification">QR Verification</a>
+        </nav>
+        <div class="header-actions">
+            <a href="/login" class="btn-nav btn-outline">Log In</a>
+            <a href="/signup" class="btn-nav btn-primary">Get Started</a>
+        </div>
+    </header>
+
+    <section class="verification-section">
+        <div class="heading">
+            <h1>Digital Verification Flow</h1>
+            <p>End-to-end digital lifecycle for weighing instrument calibration, diagnostics, and compliance approval.</p>
+        </div>
+
+        <div class="steps">
+
+            <div class="step-card">
+                <div class="icon-box">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <div class="step-content">
+                    <h2>01. Instrument Registration</h2>
+                    <p>Business owners submit instrument details including Machine ID, brand, model number, capacity, and operational address.</p>
+                </div>
+                <div class="step-number">01</div>
+            </div>
+
+            <div class="step-card">
+                <div class="icon-box">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="step-content">
+                    <h2>02. Document & Invoice Upload</h2>
+                    <p>Securely upload calibration histories, purchase invoices, and previous verification records.</p>
+                </div>
+                <div class="step-number">02</div>
+            </div>
+
+            <div class="step-card">
+                <div class="icon-box">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <div class="step-content">
+                    <h2>03. Automated Inspector Assignment</h2>
+                    <p>System matches jurisdictional territory and dispatches a certified Legal Metrology officer for on-site verification.</p>
+                </div>
+                <div class="step-number">03</div>
+            </div>
+
+            <div class="step-card">
+                <div class="icon-box">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div class="step-content">
+                    <h2>04. Sensor Diagnostics & Field Testing</h2>
+                    <p>Inspector tests load cells, tolerance thresholds, and environmental error margins with live photographic evidence.</p>
+                </div>
+                <div class="step-number">04</div>
+            </div>
+
+            <div class="step-card">
+                <div class="icon-box">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <div class="step-content">
+                    <h2>05. Verification Approval & Digital Certificate</h2>
+                    <p>State authority validates test reports and issues a tamper-evident, QR-traceable Certificate of Verification.</p>
+                </div>
+                <div class="step-number">05</div>
+            </div>
+
+        </div>
+    </section>
+
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Log In — TrueScale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-dark: #001e2b;
+            --ts-dark-surface: #072530;
+            --ts-green: #00ed64;
+            --ts-green-dark: #00684a;
+            --ts-green-light: #e8fff1;
+            --ts-gray-50: #f8fbfa;
+            --ts-gray-200: #dfe7e4;
+            --ts-gray-400: #8ea4aa;
+            --ts-gray-600: #52656d;
+            --ts-danger: #d93025;
+            --ts-danger-bg: #fce8e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            min-height: 100dvh;
+            background-color: var(--ts-gray-50);
+            color: var(--ts-dark);
+            overflow-x: hidden;
+        }
+
+        /* Left Panel - Dark Slate Section */
+        .left-panel {
+            flex: 1.1;
+            background-color: var(--ts-dark);
+            color: white;
+            padding: clamp(30px, 6vw, 70px) clamp(24px, 6vw, 80px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(0, 237, 100, 0.12), transparent 45%),
+                linear-gradient(135deg, #001e2b 40%, rgba(0,30,43,0.85) 100%);
+            z-index: 1;
+        }
+
+        .left-panel > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-home {
+            position: absolute;
+            top: clamp(20px, 4vh, 32px);
+            left: clamp(20px, 4vw, 36px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #b7c6ca;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #25424b;
+            background: rgba(7, 31, 41, 0.6);
+            backdrop-filter: blur(8px);
+            transition: all 0.25s ease;
+        }
+
+        .back-home:hover {
+            color: var(--ts-green);
+            border-color: var(--ts-green);
+            background: #071f29;
+            transform: translateX(-2px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: clamp(24px, 5vh, 48px);
+            user-select: none;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            object-fit: cover;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .brand:hover .brand-icon {
+            transform: scale(1.08) rotate(-4deg);
+        }
+
+        .left-panel h1 {
+            font-size: clamp(32px, 4vw, 54px);
+            letter-spacing: -0.03em;
+            line-height: 1.12;
+            margin-bottom: 18px;
+            font-weight: 900;
+        }
+
+        .left-panel h1 span {
+            color: var(--ts-green);
+        }
+
+        .left-panel p {
+            font-size: clamp(14px, 1.6vw, 17px);
+            margin-bottom: 36px;
+            color: #b7c6ca;
+            max-width: 460px;
+            line-height: 1.65;
+        }
+
+        .highlights {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 460px;
+        }
+
+        .highlight-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #d2e0e4;
+        }
+
+        .highlight-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 237, 100, 0.15);
+            border: 1px solid var(--ts-green);
+            color: var(--ts-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        /* Right Panel - Form Section */
+        .right-panel {
+            flex: 0.9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--ts-gray-50);
+            padding: clamp(24px, 5vw, 60px);
+        }
+
+        .form-container {
+            background: white;
+            padding: clamp(28px, 5vw, 48px);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid var(--ts-gray-200);
+            box-shadow: 0 15px 35px rgba(0, 30, 43, 0.05);
+        }
+
+        .form-container h2 {
+            font-size: clamp(24px, 3vw, 30px);
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--ts-dark);
+        }
+
+        .form-container p {
+            color: var(--ts-gray-600);
+            font-size: 14px;
+            margin-bottom: 26px;
+        }
+
+        /* Role Selection Cards */
+        .role-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ts-dark);
+            margin-bottom: 10px;
+        }
+
+        .role-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .role-card {
+            border: 2px solid var(--ts-gray-200);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            background: white;
+            position: relative;
+            user-select: none;
+        }
+
+        .role-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .role-card:hover {
+            border-color: #a8d5c4;
+            transform: translateY(-2px);
+        }
+
+        .role-card .role-icon {
+            font-size: 22px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .role-card h4 {
+            font-size: 14px;
+            margin-bottom: 2px;
+            color: var(--ts-dark);
+            font-weight: 700;
+        }
+
+        .role-card small {
+            font-size: 11px;
+            color: var(--ts-gray-600);
+            display: block;
+        }
+
+        .role-card:has(input[type="radio"]:checked) {
+            border-color: var(--ts-green);
+            background-color: var(--ts-green-light);
+            box-shadow: 0 4px 14px rgba(0, 237, 100, 0.2);
+        }
+
+        .role-card:has(input[type="radio"]:checked) h4 {
+            color: var(--ts-green-dark);
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--ts-dark);
+        }
+
+        .form-group input {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px;
+            border: 1.5px solid var(--ts-gray-200);
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--ts-dark);
+            outline: none;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-group input:focus {
+            border-color: var(--ts-green);
+            box-shadow: 0 0 0 4px rgba(0, 237, 100, 0.18);
+        }
+
+        .form-group input::placeholder {
+            color: #9cb0b7;
+        }
+
+        .btn-submit {
+            width: 100%;
+            height: 50px;
+            background-color: var(--ts-green);
+            color: var(--ts-dark);
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 14px rgba(0, 237, 100, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-submit:hover {
+            background-color: #00d957;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 237, 100, 0.45);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .btn-submit:disabled {
+            background-color: #c8d0d3;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--ts-gray-600);
+        }
+
+        .auth-links a {
+            color: var(--ts-green-dark);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .auth-links a:hover {
+            color: #00a644;
+            text-decoration: underline;
+        }
+
+        #error-message {
+            color: var(--ts-danger);
+            background: var(--ts-danger-bg);
+            border: 1px solid #f5c6cb;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-top: 16px;
+            text-align: center;
+            display: none;
+            font-weight: 600;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ================= RESPONSIVE DESIGN ================= */
+
+        /* Tablets (<= 950px) */
+        @media (max-width: 950px) {
+            body {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                flex: none;
+                padding: 40px 6% 30px;
+            }
+
+            .left-panel h1 {
+                font-size: 32px;
+                margin-bottom: 12px;
+            }
+
+            .left-panel p {
+                font-size: 15px;
+                margin-bottom: 20px;
+            }
+
+            .highlights {
+                display: none; /* Keep clean on tablet/mobile */
+            }
+
+            .right-panel {
+                flex: 1;
+                padding: 30px 5% 50px;
+            }
+
+            .form-container {
+                max-width: 520px;
+                box-shadow: 0 4px 20px rgba(0, 30, 43, 0.05);
+            }
+        }
+
+        /* Mobile Devices (<= 600px) */
+        @media (max-width: 600px) {
+            .left-panel {
+                padding: 30px 20px 24px;
+            }
+
+            .back-home {
+                top: 18px;
+                left: 18px;
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+
+            .brand {
+                margin-top: 40px;
+                margin-bottom: 16px;
+                font-size: 21px;
+            }
+
+            .brand-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .left-panel h1 {
+                font-size: 28px;
+            }
+
+            .left-panel p {
+                font-size: 14px;
+                margin-bottom: 0;
+            }
+
+            .right-panel {
+                padding: 20px 16px 40px;
+            }
+
+            .form-container {
+                padding: 24px 20px;
+                border-radius: 14px;
+            }
+
+            .role-card {
+                padding: 12px 8px;
+            }
+
+            .role-card .role-icon {
+                font-size: 18px;
+            }
+
+            .role-card h4 {
+                font-size: 13px;
+            }
+
+            .role-card small {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-panel">
+        <a href="/" class="back-home">&larr; Back to Home</a>
+        <div class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </div>
+        <h1>Welcome<br><span>Back.</span></h1>
+        <p>Log in to manage your instruments, track verification statuses, and download digital certificates securely.</p>
+
+        <div class="highlights">
+            <div class="highlight-item">
+                <span class="highlight-check">✓</span>
+                <span>Real-time status tracking and inspector scheduling</span>
+            </div>
+            <div class="highlight-item">
+                <span class="highlight-check">✓</span>
+                <span>Tamper-proof digital certificates with QR codes</span>
+            </div>
+            <div class="highlight-item">
+                <span class="highlight-check">✓</span>
+                <span>Legal Metrology compliant workflows</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="form-container">
+            <h2>Log In</h2>
+            <p>Select your portal and enter your credentials.</p>
+
+            <form id="loginForm">
+                <span class="role-label">Choose Account Portal</span>
+                <div class="role-selection">
+                    <label class="role-card">
+                        <input type="radio" name="role" value="owner" checked>
+                        <span class="role-icon">🏢</span>
+                        <h4>User</h4>
+                        <small>Facility Owner</small>
+                    </label>
+                    <label class="role-card">
+                        <input type="radio" name="role" value="inspector">
+                        <span class="role-icon">🔍</span>
+                        <h4>Inspector</h4>
+                        <small>Field Inspector</small>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required placeholder="name@example.com" autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn-submit" id="loginBtn">Log In to Portal →</button>
+                <div id="error-message"></div>
+            </form>
+
+            <div class="auth-links">
+                Don't have an Owner account? <a href="/signup">Sign up here</a>
+            </div>
+        </div>
+    </div>
+
+    <script id="firebase-config" type="application/json"><%- JSON.stringify(firebaseConfig || {}) %></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const configText = document.getElementById('firebase-config').textContent;
+        const app = initializeApp(JSON.parse(configText));
+        const auth = getAuth(app);
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const role = document.querySelector('input[name="role"]:checked').value;
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('error-message');
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Verifying credentials...';
+            errorDiv.style.display = 'none';
+
+            if (role === 'owner') {
+                // === 1. OWNER LOGIN (Uses Firebase Auth) ===
+                signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => userCredential.user.getIdToken())
+                    .then((token) => {
+                        document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Strict`;
+                        window.location.href = '/auth/redirect';
+                    })
+                    .catch((error) => {
+                        errorDiv.textContent = "Owner login failed. Please verify your email and password.";
+                        errorDiv.style.display = 'block';
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Log In to Portal →';
+                    });
+
+            } else if (role === 'inspector') {
+                // === 2. INSPECTOR LOGIN (Uses MongoDB Backend) ===
+                try {
+                    const response = await fetch('/api/login/inspector', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        window.location.href = data.redirectUrl;
+                    } else {
+                        errorDiv.textContent = "Inspector Login Failed: " + (data.message || 'Invalid credentials');
+                        errorDiv.style.display = 'block';
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Log In to Portal →';
+                    }
+                } catch (err) {
+                    errorDiv.textContent = "Server error connecting to database.";
+                    errorDiv.style.display = 'block';
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Log In to Portal →';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

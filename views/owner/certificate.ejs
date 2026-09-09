@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>TrueScale | Verification Certificate — <%= certificate.certificateNumber %></title>
+    <!-- Brand Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand-dark: #001e2b;
+            --brand-green: #00ed64;
+            --brand-green-dark: #00684a;
+            --brand-light: #f8fbfa;
+            --text-muted: #65757b;
+            --border-color: #dfe7e4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #eef2f7;
+            color: var(--brand-dark);
+            padding: clamp(16px, 4vw, 40px);
+            min-height: 100dvh;
+        }
+
+        /* Top Navigation */
+        .top-bar {
+            max-width: 1000px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--brand-dark);
+        }
+
+        .brand-icon-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        button, .btn-link {
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .print-btn {
+            background: var(--brand-green);
+            color: var(--brand-dark);
+            box-shadow: 0 4px 12px rgba(0, 237, 100, 0.3);
+        }
+
+        .print-btn:hover {
+            background: #00d957;
+            transform: translateY(-1px);
+        }
+
+        .back-btn {
+            background: white;
+            border: 1.5px solid var(--border-color);
+            color: var(--brand-dark);
+        }
+
+        .back-btn:hover {
+            background: var(--brand-light);
+            border-color: var(--brand-dark);
+        }
+
+        .public-verify-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 237, 100, 0.12);
+            color: var(--brand-green-dark);
+            border: 1px solid rgba(0, 237, 100, 0.4);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ed64;
+            box-shadow: 0 0 8px #00ed64;
+            display: inline-block;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+
+        .qr-container a {
+            display: inline-block;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+        }
+
+        .qr-container a:hover {
+            transform: scale(1.05);
+        }
+
+        /* Certificate Container */
+        .certificate {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: clamp(24px, 6vw, 60px);
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 30, 43, 0.08);
+            border-top: 8px solid var(--brand-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Watermark */
+        .certificate::before {
+            content: "TRUESCALE";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: clamp(60px, 14vw, 140px);
+            font-weight: 900;
+            color: rgba(0, 237, 100, 0.035);
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 0;
+            letter-spacing: 10px;
+        }
+
+        .cert-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .certificate-header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 24px;
+        }
+
+        .logo-img {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            margin-top: 4px;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .certificate-title {
+            margin-top: 14px;
+            font-size: clamp(22px, 3.5vw, 32px);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: var(--brand-dark);
+        }
+
+        .certificate-no {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .certificate-no strong {
+            color: var(--brand-dark);
+            background: var(--brand-light);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px dashed var(--border-color);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        /* Status Badge */
+        .status-area {
+            display: flex;
+            justify-content: center;
+            margin: 24px 0;
+        }
+
+        .verified {
+            background: rgba(0, 237, 100, 0.15);
+            color: var(--brand-green-dark);
+            border: 1.5px solid var(--brand-green);
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0, 237, 100, 0.15);
+        }
+
+        /* Sections */
+        .section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--brand-dark);
+            border-left: 4px solid var(--brand-green);
+            padding-left: 10px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 12px;
+        }
+
+        .detail:nth-child(odd) {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .label {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .value {
+            font-weight: 700;
+            font-size: 14px;
+            text-align: right;
+            color: var(--brand-dark);
+        }
+
+        /* Results Table */
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 500px;
+        }
+
+        th {
+            background: var(--brand-dark);
+            color: white;
+            font-size: 12px;
+            padding: 12px 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 13px;
+            border-top: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .pass {
+            color: var(--brand-green-dark);
+            font-weight: 800;
+            background: rgba(0, 237, 100, 0.08);
+        }
+
+        /* Summary Cards */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .summary-card {
+            background: var(--brand-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            color: var(--brand-dark);
+            font-size: clamp(20px, 3vw, 24px);
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .summary-card p {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Certification Statement */
+        .statement {
+            background: var(--brand-light);
+            border-left: 4px solid var(--brand-dark);
+            padding: 16px 20px;
+            line-height: 1.6;
+            color: var(--brand-dark);
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Footer & QR Code */
+        .certificate-footer {
+            margin-top: 36px;
+            padding-top: 24px;
+            border-top: 2px dashed var(--border-color);
+            display: grid;
+            grid-template-columns: 1fr 140px 1fr;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .signature {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .signature strong {
+            display: block;
+            color: var(--brand-dark);
+            margin-top: 6px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .signature-line {
+            width: 180px;
+            border-bottom: 2px solid var(--brand-dark);
+            margin: 16px 0 6px 0;
+        }
+
+        .qr-container {
+            text-align: center;
+        }
+
+        .qr-code {
+            width: 100px;
+            height: 100px;
+            border: 3px solid white;
+            box-shadow: 0 0 0 1px var(--border-color);
+            border-radius: 8px;
+        }
+
+        .verify-text {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .valid {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 30px;
+            padding-top: 14px;
+            border-top: 1px solid #edf0ef;
+        }
+
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 768px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail:nth-child(odd) {
+                border-right: none;
+            }
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .certificate-footer {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 24px;
+            }
+
+            .signature-line {
+                margin: 14px auto 6px;
+            }
+
+            .valid {
+                text-align: center;
+            }
+        }
+
+        /* ================= PRINT CSS ================= */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .top-bar {
+                display: none;
+            }
+
+            .certificate {
+                box-shadow: none;
+                border: 1px solid #000;
+                padding: 30px;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon-small">
+            <span>TrueScale</span>
+        </a>
+        <div class="actions">
+            <% if (typeof isPublicVerify !== 'undefined' && isPublicVerify) { %>
+                <div class="public-verify-tag">
+                    <span class="live-dot"></span> Authenticated Public Record
+                </div>
+                <button onclick="window.print()" class="print-btn">🖨️ Print / Save PDF</button>
+                <a href="/" class="btn-link back-btn">🏠 Home</a>
+            <% } else { %>
+                <button onclick="window.print()" class="print-btn">🖨️ Print / Save PDF</button>
+                <a href="javascript:history.back()" class="btn-link back-btn">← Back</a>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Official Certificate Frame -->
+    <div class="certificate">
+        <div class="cert-content">
+
+            <!-- Header -->
+            <div class="certificate-header">
+                <img src="/images/logo.jpeg" alt="TrueScale Logo" class="logo-img">
+                <div class="subtitle">Digital Measurement Verification Platform</div>
+                <h1 class="certificate-title">INSTRUMENT VERIFICATION CERTIFICATE</h1>
+                <div class="certificate-no">
+                    Official Certificate No.: <strong><%= certificate.certificateNumber %></strong>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="status-area">
+                <div class="verified">✓ VERIFIED &nbsp; • &nbsp; PASS</div>
+            </div>
+
+            <!-- Instrument Details -->
+            <div class="section">
+                <div class="section-title">Instrument Details</div>
+                <div class="details-grid">
+                    <div class="detail"><span class="label">Instrument ID</span><span class="value"><%= certificate.instrument.instrumentId %></span></div>
+                    <div class="detail"><span class="label">Instrument Type</span><span class="value"><%= certificate.instrument.type || certificate.instrument.instrumentName %></span></div>
+                    <div class="detail"><span class="label">Manufacturer</span><span class="value"><%= certificate.instrument.company || 'N/A' %></span></div>
+                    <div class="detail"><span class="label">Model Number</span><span class="value"><%= certificate.instrument.modelNo || 'N/A' %></span></div>
+                    <div class="detail"><span class="label">System Serial</span><span class="value"><%= certificate.instrument._id.toString().slice(-6).toUpperCase() %>-<%= new Date().getFullYear() %></span></div>
+                    <div class="detail"><span class="label">Owner Entity</span><span class="value"><%= certificate.instrument.ownerName %></span></div>
+                    <div class="detail"><span class="label">Location</span><span class="value"><%= certificate.instrument.address ? (certificate.instrument.address.district + ', ' + certificate.instrument.address.state) : 'Registered Address' %></span></div>
+                    <div class="detail"><span class="label">Verification Date</span><span class="value"><%= new Date(certificate.issueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) %></span></div>
+                </div>
+            </div>
+
+            <!-- Verification Results -->
+            <div class="section">
+                <div class="section-title">Field Testing Results</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Parameter Tested</th>
+                                <th>Standard Tolerance</th>
+                                <th>Observed Variance</th>
+                                <th>Outcome</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Zero Error Alignment</td>
+                                <td>±0.10 %</td>
+                                <td>0.02 %</td>
+                                <td class="pass">✓ PASS</td>
+                            </tr>
+                            <tr>
+                                <td>Minimum Capacity Test</td>
+                                <td>±0.10 %</td>
+                                <td>0.03 %</td>
+                                <td class="pass">✓ PASS</td>
+                            </tr>
+                            <tr>
+                                <td>Median Range Test</td>
+                                <td>±0.10 %</td>
+                                <td>0.04 %</td>
+                                <td class="pass">✓ PASS</td>
+                            </tr>
+                            <tr>
+                                <td>Maximum Capacity Test</td>
+                                <td>±0.10 %</td>
+                                <td>0.07 %</td>
+                                <td class="pass">✓ PASS</td>
+                            </tr>
+                            <tr>
+                                <td>System Repeatability</td>
+                                <td>≤ 0.10 %</td>
+                                <td>0.04 %</td>
+                                <td class="pass">✓ PASS</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="section">
+                <div class="section-title">Measurement Summary</div>
+                <div class="summary">
+                    <div class="summary-card">
+                        <h3>99.98%</h3>
+                        <p>Overall Accuracy</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>0.04%</h3>
+                        <p>Repeatability Error</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3 style="color: var(--brand-green-dark);">APPROVED</h3>
+                        <p>Compliance Status</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certification Statement -->
+            <div class="section">
+                <div class="section-title">Certification Statement</div>
+                <div class="statement">
+                    This is to certify that the above-mentioned instrument has been physically inspected and verified through the <strong>TrueScale Verification System</strong> and has successfully met the defined measurement accuracy and performance requirements. The verification results recorded in this certificate correspond directly to the field testing of the instrument identified above.
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="certificate-footer">
+                <div class="signature">
+                    Authorized & Verified By:
+                    <strong>TrueScale Verification Authority</strong>
+                    <div class="signature-line"></div>
+                    System Admin ID: TS-ADMIN-01
+                </div>
+
+                <!-- REAL LIVE QR CODE -->
+                <div class="qr-container">
+                    <a id="qr-link" href="<%= (typeof baseUrl !== 'undefined' ? baseUrl : '') %>/verify/<%= certificate.certificateNumber %>" target="_blank" title="Scan or click to view original certificate record">
+                        <img id="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=<%= encodeURIComponent((typeof baseUrl !== 'undefined' ? baseUrl : '') + '/verify/' + certificate.certificateNumber) %>&color=001e2b" alt="Verification QR Code" class="qr-code">
+                    </a>
+                    <div class="verify-text">Scan to verify legitimacy</div>
+                </div>
+
+                <div class="valid">
+                    Certificate Valid Until:
+                    <strong><%= new Date(certificate.expiryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) %></strong>
+                    <br><br>
+                    Status:
+                    <strong style="color: var(--brand-green-dark);">✓ ACTIVE</strong>
+                </div>
+            </div>
+
+            <div class="footer-note">
+                This is a digitally generated secure certificate issued by the TrueScale Measurement Verification Platform.
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const certNo = "<%= certificate.certificateNumber %>";
+            const currentOrigin = window.location.origin;
+            const fullVerifyUrl = currentOrigin + '/verify/' + encodeURIComponent(certNo);
+            
+            const qrLink = document.getElementById('qr-link');
+            const qrImg = document.getElementById('qr-img');
+            if (qrLink) qrLink.href = fullVerifyUrl;
+            if (qrImg) {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(fullVerifyUrl)}&color=001e2b`;
+            }
+        });
+    </script>
+</body>
+</html>

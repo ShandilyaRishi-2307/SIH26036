@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Reschedule Queue — TrueScale Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-bg: #00121a;
+            --ts-dark: #001e2b;
+            --ts-surface: #042633;
+            --ts-border: #0c3845;
+            --ts-green: #00ed64;
+            --ts-red: #ff4757;
+            --ts-text: #f8fbfa;
+            --ts-muted: #81989f;
+            --ts-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--ts-bg);
+            color: var(--ts-text);
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--ts-dark);
+            border-bottom: 1px solid var(--ts-border);
+            padding: 18px clamp(16px, 5vw, 40px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .back-link {
+            color: var(--ts-green);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: rgba(0, 237, 100, 0.08);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(0, 237, 100, 0.18);
+            transform: translateX(-2px);
+        }
+
+        .container {
+            padding: clamp(24px, 4vw, 40px) clamp(16px, 5vw, 40px);
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        h1 {
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: white;
+        }
+
+        .subtitle {
+            color: var(--ts-muted);
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: clamp(16px, 2.5vw, 24px);
+        }
+
+        .req-card {
+            background: var(--ts-dark);
+            border: 1px solid rgba(255, 71, 87, 0.4);
+            border-radius: var(--ts-radius);
+            padding: clamp(20px, 3vw, 28px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+        }
+
+        .req-card:hover {
+            border-color: var(--ts-red);
+            transform: translateY(-2px);
+        }
+
+        .req-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--ts-border);
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+            gap: 10px;
+        }
+
+        .inst-id {
+            font-family: monospace;
+            color: var(--ts-red);
+            background: rgba(255, 71, 87, 0.12);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 12.5px;
+            border: 1px solid rgba(255, 71, 87, 0.25);
+            white-space: nowrap;
+        }
+
+        .detail {
+            font-size: 13.5px;
+            color: var(--ts-muted);
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .detail strong {
+            color: white;
+        }
+
+        .reason-badge {
+            background: rgba(255, 71, 87, 0.15);
+            color: #ff8585;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--ts-border);
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11.5px;
+            color: var(--ts-muted);
+            margin-bottom: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--ts-surface);
+            border: 1px solid var(--ts-border);
+            color: white;
+            border-radius: 8px;
+            font-family: inherit;
+            margin-bottom: 12px;
+            outline: none;
+            font-size: 13.5px;
+        }
+
+        input[type="date"]:focus {
+            border-color: var(--ts-green);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--ts-green);
+            color: var(--ts-dark);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 44px;
+        }
+
+        .btn-submit:hover {
+            background: #00d957;
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            background: var(--ts-dark);
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: var(--ts-radius);
+            border: 1.5px dashed var(--ts-border);
+            color: var(--ts-muted);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/admin/dashboard" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale Admin</span>
+        </a>
+        <a href="/admin/dashboard" class="back-link">← Command Center</a>
+    </header>
+
+    <div class="container">
+        <h1>Reschedule Queue</h1>
+        <p class="subtitle">Field inspection visits marked with issues by inspectors. Assign a new verification date.</p>
+
+        <div class="grid">
+            <% if (requests && requests.length > 0) { %>
+                <% requests.forEach(function(req) { %>
+                    <div class="req-card">
+                        <div class="req-header">
+                            <div>
+                                <h2 style="font-size: 17px; font-weight: 800; color: white;"><%= req.instrument.instrumentName || req.instrument.type %></h2>
+                                <span style="font-size: 12px; color: var(--ts-muted);">Owner: <%= req.instrument.ownerName %></span>
+                            </div>
+                            <span class="inst-id"><%= req.instrument.instrumentId %></span>
+                        </div>
+
+                        <div class="detail">
+                            <strong>Reason:</strong> <span class="reason-badge"><%= req.reason %></span>
+                        </div>
+
+                        <div class="detail">
+                            <strong>Location:</strong> <%= req.instrument.address ? req.instrument.address.city + ', ' + req.instrument.address.district : 'N/A' %>
+                        </div>
+
+                        <div class="detail">
+                            <strong>Current Inspector:</strong> <%= req.inspector ? req.inspector.name : 'Unassigned' %>
+                        </div>
+
+                        <form action="/api/admin/resolve-reschedule" method="POST" class="form-group">
+                            <input type="hidden" name="requestId" value="<%= req._id %>">
+                            <input type="hidden" name="instrumentId" value="<%= req.instrument._id %>">
+                            
+                            <label>New Scheduled Date</label>
+                            <input type="date" name="newDate" required>
+                            
+                            <button type="submit" class="btn-submit">Confirm Reschedule →</button>
+                        </form>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div style="font-size: 32px; margin-bottom: 10px;">✓</div>
+                    <h3 style="color: white; margin-bottom: 4px;">Queue is Clean</h3>
+                    <p>No active inspection issues or reschedule requests at this time.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

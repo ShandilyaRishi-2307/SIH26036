@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Onboard Inspector — TrueScale Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-bg: #00121a;
+            --ts-dark: #001e2b;
+            --ts-surface: #042633;
+            --ts-border: #0c3845;
+            --ts-green: #00ed64;
+            --ts-text: #f8fbfa;
+            --ts-muted: #81989f;
+            --ts-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--ts-bg);
+            color: var(--ts-text);
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--ts-dark);
+            border-bottom: 1px solid var(--ts-border);
+            padding: 18px clamp(16px, 5vw, 40px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .back-link {
+            color: var(--ts-green);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: rgba(0, 237, 100, 0.08);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(0, 237, 100, 0.18);
+            transform: translateX(-2px);
+        }
+
+        .container {
+            padding: clamp(24px, 4vw, 50px) clamp(16px, 4vw, 30px);
+            max-width: 620px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-card {
+            background: var(--ts-dark);
+            padding: clamp(22px, 4vw, 40px);
+            border-radius: var(--ts-radius);
+            border: 1px solid var(--ts-border);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+        }
+
+        h1 {
+            font-size: clamp(22px, 3vw, 26px);
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: white;
+        }
+
+        p.sub {
+            color: var(--ts-muted);
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--ts-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid var(--ts-border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: white;
+            background: #022635;
+            outline: none;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--ts-green);
+            background: #033042;
+            box-shadow: 0 0 0 3px rgba(0, 237, 100, 0.12);
+        }
+
+        .territory-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--ts-green);
+            color: var(--ts-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 14.5px;
+            cursor: pointer;
+            margin-top: 10px;
+            min-height: 48px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(0, 237, 100, 0.25);
+        }
+
+        button:hover {
+            background: #00d957;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 237, 100, 0.35);
+        }
+
+        @media (max-width: 600px) {
+            .territory-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/admin/dashboard" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale Admin</span>
+        </a>
+        <a href="/admin/dashboard" class="back-link">← Dashboard</a>
+    </header>
+
+    <div class="container">
+        <div class="form-card">
+            <h1>Register Field Inspector</h1>
+            <p class="sub">Create an inspector account. Official credentials will be dispatched automatically.</p>
+            
+            <form action="/api/admin/add-inspector" method="POST">
+                <div class="form-group">
+                    <label>Inspector Full Name</label>
+                    <input type="text" name="name" placeholder="e.g. Amit Singh" required>
+                </div>
+                <div class="form-group">
+                    <label>Official Email</label>
+                    <input type="email" name="email" placeholder="e.g. a.singh@truescale.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Initial Password</label>
+                    <input type="text" name="password" placeholder="e.g. FieldOp2026!" required>
+                </div>
+                
+                <!-- Geographic Territory Assignment -->
+                <div class="territory-grid">
+                    <div>
+                        <label>Assigned State</label>
+                        <select name="state" required>
+                            <option value="" disabled selected>Select State...</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="West Bengal">West Bengal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Assigned District</label>
+                        <input type="text" name="district" placeholder="e.g. South Delhi" required>
+                    </div>
+                </div>
+
+                <button type="submit">Create & Dispatch Credentials →</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

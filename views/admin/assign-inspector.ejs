@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Assign Inspectors — TrueScale Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-bg: #00121a;
+            --ts-dark: #001e2b;
+            --ts-surface: #042633;
+            --ts-border: #0c3845;
+            --ts-green: #00ed64;
+            --ts-text: #f8fbfa;
+            --ts-muted: #81989f;
+            --ts-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--ts-bg);
+            color: var(--ts-text);
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--ts-dark);
+            border-bottom: 1px solid var(--ts-border);
+            padding: 18px clamp(16px, 5vw, 40px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .back-link {
+            color: var(--ts-green);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: rgba(0, 237, 100, 0.08);
+            border: 1px solid rgba(0, 237, 100, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(0, 237, 100, 0.18);
+            transform: translateX(-2px);
+        }
+
+        .container {
+            padding: clamp(24px, 4vw, 40px) clamp(16px, 5vw, 40px);
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        h1 {
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: white;
+        }
+
+        .subtitle {
+            color: var(--ts-muted);
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        .req-card {
+            background: var(--ts-dark);
+            padding: clamp(20px, 3vw, 28px);
+            border-radius: var(--ts-radius);
+            margin-bottom: 20px;
+            border: 1px solid var(--ts-border);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .req-card:hover {
+            border-color: rgba(0, 237, 100, 0.4);
+        }
+
+        .location-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 237, 100, 0.12);
+            color: var(--ts-green);
+            font-weight: 800;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(0, 237, 100, 0.25);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--ts-border);
+        }
+
+        .info-item span {
+            display: block;
+            font-size: 11.5px;
+            color: var(--ts-muted);
+            margin-bottom: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item strong {
+            font-size: 14.5px;
+            color: white;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .inst-id-badge {
+            font-size: 13px;
+            color: var(--ts-muted);
+            font-family: monospace;
+            background: var(--ts-surface);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--ts-border);
+        }
+
+        .dispatch-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        select {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--ts-border);
+            width: min(100%, 280px);
+            outline: none;
+            background: #022635;
+            color: white;
+            font-size: 13.5px;
+            font-family: inherit;
+        }
+
+        select:focus {
+            border-color: var(--ts-green);
+        }
+
+        button {
+            padding: 10px 22px;
+            background: var(--ts-green);
+            color: var(--ts-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 42px;
+        }
+
+        button:hover {
+            background: #00d957;
+            transform: translateY(-1px);
+        }
+
+        .empty-state {
+            background: var(--ts-dark);
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: var(--ts-radius);
+            border: 1.5px dashed var(--ts-border);
+            color: var(--ts-muted);
+        }
+
+        @media (max-width: 768px) {
+            .dispatch-form {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            select {
+                width: 100%;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .action-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/admin/dashboard" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale Admin</span>
+        </a>
+        <a href="/admin/dashboard" class="back-link">← Dashboard</a>
+    </header>
+
+    <div class="container">
+        <h1>Location-Based Inspection Queue</h1>
+        <p class="subtitle">Review pending owner applications and assign qualified regional field inspectors.</p>
+
+        <% if (requests && requests.length > 0) { %>
+            <% requests.forEach(function(req) { %>
+                <div class="req-card">
+                    <div class="location-tag">
+                        📍 <%= req.address.state %> » <%= req.address.district %> » <%= req.address.city %>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span>Facility / Owner</span>
+                            <strong><%= req.ownerName %></strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Exact Address</span>
+                            <strong><%= req.address.locality %></strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Instrument</span>
+                            <strong><%= req.type %> (<%= req.modelNo %>)</strong>
+                        </div>
+                    </div>
+
+                    <div class="action-row">
+                        <span class="inst-id-badge">ID: <%= req.instrumentId %></span>
+                        
+                        <form action="/api/admin/assign" method="POST" class="dispatch-form">
+                            <input type="hidden" name="instrumentId" value="<%= req._id %>">
+                            
+                            <select name="inspectorId" required>
+                                <option value="" disabled selected>Assign Inspector...</option>
+                                <% inspectors.forEach(function(inspector) { %>
+                                    <option value="<%= inspector._id %>">
+                                        <%= inspector.name %> (<%= inspector.location ? inspector.location.district + ', ' + inspector.location.state : 'No Location' %>)
+                                    </option>
+                                <% }); %>
+                            </select>
+                            
+                            <button type="submit">Dispatch Field Agent →</button>
+                        </form>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="empty-state">
+                <div style="font-size: 36px; margin-bottom: 12px;">✓</div>
+                <h3 style="color: white; margin-bottom: 6px; font-size: 18px;">All Caught Up!</h3>
+                <p>No pending verification requests awaiting inspector assignment at this time.</p>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

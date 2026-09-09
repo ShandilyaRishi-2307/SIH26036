@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Due Verifications — TrueScale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-dark: #001e2b;
+            --ts-green: #00ed64;
+            --ts-green-dark: #00684a;
+            --ts-green-light: #e8fff1;
+            --ts-gray-50: #f8fbfa;
+            --ts-gray-100: #eef3f2;
+            --ts-gray-200: #dfe7e4;
+            --ts-gray-400: #8ea4aa;
+            --ts-gray-600: #52656d;
+            --ts-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            min-height: 100dvh;
+            background-color: var(--ts-gray-50);
+            color: var(--ts-dark);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            min-height: 100dvh;
+            background-color: var(--ts-dark);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100dvh;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 36px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover .brand-icon {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        .side-title {
+            color: #5c7983;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 12px 10px 8px;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #b8c8cc;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: #08232e;
+            color: white;
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: #0b2f38;
+            color: var(--ts-green);
+            font-weight: 700;
+            box-shadow: inset 3px 0 0 var(--ts-green);
+        }
+
+        .sidebar-logout {
+            margin-top: auto;
+            color: #ff6b6b;
+            padding: 12px 16px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-logout:hover {
+            background: rgba(255, 107, 107, 0.12);
+            color: #ff8585;
+        }
+
+        /* Mobile Header & Drawer */
+        .mobile-topbar {
+            display: none;
+            height: 64px;
+            background: var(--ts-dark);
+            color: white;
+            padding: 0 18px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .mobile-topbar .brand {
+            margin-bottom: 0;
+            font-size: 19px;
+            gap: 10px;
+        }
+
+        .mobile-topbar .brand-icon {
+            width: 34px;
+            height: 34px;
+        }
+
+        .mobile-menu-btn {
+            background: #082833;
+            border: 1px solid #14404f;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .drawer-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 20, 28, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1100;
+        }
+
+        .drawer-backdrop.active {
+            display: block;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: min(80vw, 300px);
+            height: 100dvh;
+            background: var(--ts-dark);
+            z-index: 1150;
+            padding: 24px 18px;
+            display: flex;
+            flex-direction: column;
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .mobile-drawer.active {
+            left: 0;
+        }
+
+        .drawer-close {
+            align-self: flex-end;
+            background: transparent;
+            border: none;
+            color: #8ea4aa;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: clamp(20px, 4vw, 40px) clamp(16px, 5vw, 60px);
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        .header {
+            margin-bottom: clamp(24px, 4vh, 36px);
+        }
+
+        .header h1 {
+            font-size: clamp(24px, 3vw, 32px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--ts-dark);
+        }
+
+        .header p {
+            color: var(--ts-gray-600);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .table-container {
+            background: white;
+            border: 1px solid var(--ts-gray-200);
+            border-radius: var(--ts-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 30, 43, 0.02);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 600px;
+        }
+
+        th {
+            padding: 14px 22px;
+            background: var(--ts-gray-50);
+            color: var(--ts-gray-600);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--ts-gray-200);
+        }
+
+        td {
+            padding: 16px 22px;
+            border-bottom: 1px solid #edf0ef;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(248, 251, 250, 0.6);
+        }
+
+        .date-alert {
+            color: #d93025;
+            font-weight: 700;
+        }
+
+        .btn-renew {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: white;
+            border: 1.5px solid #d93025;
+            color: #d93025;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-renew:hover {
+            background: #d93025;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Mobile Breakpoint */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .main-content {
+                padding: 24px 16px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Topbar -->
+    <header class="mobile-topbar">
+        <button class="mobile-menu-btn" id="drawerOpenBtn" aria-label="Open menu">☰</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <a href="/owner/<%= userId %>/apply" style="color: var(--ts-green); font-size: 13px; font-weight: 700; text-decoration: none;">+ Apply</a>
+    </header>
+
+    <!-- Mobile Drawer -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">OWNER PORTAL</div>
+        <a href="/owner/<%= userId %>" class="nav-item">📊 Dashboard</a>
+        <a href="/owner/<%= userId %>/instruments" class="nav-item">⚖️ My Instruments</a>
+        <a href="/owner/<%= userId %>/apply" class="nav-item">📝 Apply for Verification</a>
+        <a href="/owner/<%= userId %>/status" class="nav-item">⏱️ Application Status</a>
+        <a href="/owner/<%= userId %>/due-verifications" class="nav-item active">🔔 Due Verifications</a>
+        <a href="/owner/<%= userId %>/certificates" class="nav-item">📜 Certificates</a>
+        <a id="mobile-sidebar-logout-btn" class="sidebar-logout">🚪 Log Out</a>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">OWNER PORTAL</div>
+        <a href="/owner/<%= userId %>" class="nav-item">📊 Dashboard</a>
+        <a href="/owner/<%= userId %>/instruments" class="nav-item">⚖️ My Instruments</a>
+        <a href="/owner/<%= userId %>/apply" class="nav-item">📝 Apply for Verification</a>
+        <a href="/owner/<%= userId %>/status" class="nav-item">⏱️ Application Status</a>
+        <a href="/owner/<%= userId %>/due-verifications" class="nav-item active">🔔 Due Verifications</a>
+        <a href="/owner/<%= userId %>/certificates" class="nav-item">📜 Certificates</a>
+        <a id="sidebar-logout-btn" class="sidebar-logout">🚪 Log Out</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Upcoming Verifications</h1>
+            <p>Track the renewal cycle for your certified instruments to prevent compliance lapses.</p>
+        </header>
+
+        <div class="table-container">
+            <div class="table-responsive">
+                <% if (dueVerifications && dueVerifications.length > 0) { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Instrument & ID</th>
+                                <th>Location</th>
+                                <th>Next Renewal Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% dueVerifications.forEach(function(cert) { %>
+                                <tr>
+                                    <td>
+                                        <strong><%= cert.instrument.instrumentName || cert.instrument.type %></strong>
+                                        <div style="font-family: monospace; color: var(--ts-gray-600); margin-top: 4px; font-size: 12px;">ID: <%= cert.instrument.instrumentId %></div>
+                                    </td>
+                                    <td style="color: var(--ts-gray-600);"><%= cert.instrument.address ? (cert.instrument.address.city + ', ' + cert.instrument.address.state) : 'Registered Address' %></td>
+                                    <td class="date-alert">
+                                        📅 <%= new Date(cert.expiryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                                    </td>
+                                    <td>
+                                        <a href="/owner/<%= userId %>/apply?renew=<%= cert.instrument.instrumentId %>" class="btn-renew">
+                                            Apply for Renewal →
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <div style="padding: 60px 20px; text-align: center; color: var(--ts-gray-600);">
+                        <h3 style="font-size: 18px; font-weight: 800; color: var(--ts-dark); margin-bottom: 6px;">No Upcoming Renewals</h3>
+                        <p>All your instruments are currently within their valid certification window.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const drawerOpenBtn = document.getElementById('drawerOpenBtn');
+        const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerBackdrop = document.getElementById('drawerBackdrop');
+
+        function openDrawer() {
+            mobileDrawer.classList.add('active');
+            drawerBackdrop.classList.add('active');
+        }
+
+        function closeDrawer() {
+            mobileDrawer.classList.remove('active');
+            drawerBackdrop.classList.remove('active');
+        }
+
+        if (drawerOpenBtn) drawerOpenBtn.addEventListener('click', openDrawer);
+        if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+        if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+    </script>
+
+    <script id="firebase-config" type="application/json"><%- JSON.stringify(locals.firebaseConfig || {}) %></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        const configText = document.getElementById('firebase-config').textContent;
+        const app = initializeApp(JSON.parse(configText));
+        const auth = getAuth(app);
+
+        const handleLogout = () => {
+            signOut(auth).then(() => {
+                document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                window.location.href = '/login';
+            });
+        };
+
+        const sidebarLogoutBtn = document.getElementById('sidebar-logout-btn');
+        const mobileSidebarLogoutBtn = document.getElementById('mobile-sidebar-logout-btn');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', handleLogout);
+        if (mobileSidebarLogoutBtn) mobileSidebarLogoutBtn.addEventListener('click', handleLogout);
+    </script>
+</body>
+</html>

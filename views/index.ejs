@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>TrueScale — Verify. Certify. Trust.</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --ts-dark: #001e2b;
+            --ts-dark-surface: #072530;
+            --ts-dark-border: #1a3c48;
+            --ts-green: #00ed64;
+            --ts-green-dark: #00684a;
+            --ts-green-light: #e8fff1;
+            --ts-gray-50: #f8fbfa;
+            --ts-gray-100: #eef3f2;
+            --ts-gray-200: #dfe7e4;
+            --ts-gray-400: #8ea4aa;
+            --ts-gray-600: #52656d;
+            --ts-gray-800: #1a2d34;
+            --ts-shadow-sm: 0 2px 8px rgba(0, 30, 43, 0.05);
+            --ts-shadow-md: 0 10px 25px rgba(0, 30, 43, 0.08);
+            --ts-shadow-lg: 0 20px 50px rgba(0, 30, 43, 0.12);
+            --ts-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--ts-dark);
+            background: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ================= NAVBAR ================= */
+        .navbar {
+            height: 74px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(16px, 5vw, 60px);
+            border-bottom: 1px solid rgba(229, 233, 235, 0.8);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            height: 66px;
+            box-shadow: 0 4px 20px rgba(0, 30, 43, 0.06);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        /* Brand */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--ts-dark);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+
+        .brand:hover {
+            color: var(--ts-green-dark);
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0, 30, 43, 0.12);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .brand:hover .brand-icon {
+            transform: scale(1.08) rotate(-4deg);
+            box-shadow: 0 6px 16px rgba(0, 237, 100, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ts-gray-600);
+        }
+
+        .nav-links a {
+            position: relative;
+            padding: 6px 2px;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--ts-green);
+            transition: width 0.25s ease;
+            border-radius: 2px;
+        }
+
+        .nav-links a:hover {
+            color: var(--ts-dark);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1.5px solid var(--ts-gray-200);
+            color: var(--ts-dark);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--ts-dark);
+            background: var(--ts-gray-50);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--ts-green);
+            border: 1.5px solid var(--ts-green);
+            color: var(--ts-dark);
+            box-shadow: 0 4px 14px rgba(0, 237, 100, 0.35);
+        }
+
+        .btn-primary:hover {
+            background: #00d957;
+            border-color: #00d957;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 237, 100, 0.45);
+        }
+
+        /* Hamburger Menu Button */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: var(--ts-gray-50);
+            border: 1px solid var(--ts-gray-200);
+            cursor: pointer;
+            gap: 5px;
+            padding: 0;
+            z-index: 1100;
+            transition: all 0.25s ease;
+        }
+
+        .menu-toggle:hover {
+            background: var(--ts-gray-100);
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--ts-dark);
+            border-radius: 2px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-8px);
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* Mobile Drawer */
+        .mobile-drawer-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 30, 43, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1050;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-drawer-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: min(85vw, 360px);
+            height: 100dvh;
+            background: white;
+            z-index: 1060;
+            box-shadow: -10px 0 30px rgba(0, 30, 43, 0.15);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+        }
+
+        .mobile-drawer.active {
+            right: 0;
+        }
+
+        .mobile-drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--ts-gray-200);
+            margin-bottom: 20px;
+        }
+
+        .mobile-drawer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .mobile-drawer-links a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ts-dark);
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-drawer-links a:hover,
+        .mobile-drawer-links a:active {
+            background: var(--ts-gray-50);
+            color: var(--ts-green-dark);
+            transform: translateX(4px);
+        }
+
+        .mobile-drawer-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--ts-gray-200);
+        }
+
+        .mobile-drawer-actions .btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+        }
+
+        /* ================= HERO ================= */
+        .hero {
+            position: relative;
+            min-height: calc(100vh - 74px);
+            padding: clamp(40px, 8vh, 90px) clamp(16px, 6vw, 80px);
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            align-items: center;
+            gap: clamp(30px, 5vw, 70px);
+            background:
+                radial-gradient(circle at 85% 25%, rgba(0, 237, 100, 0.15), transparent 40%),
+                radial-gradient(circle at 10% 80%, rgba(0, 104, 74, 0.08), transparent 35%),
+                linear-gradient(180deg, #ffffff 0%, #f8fbfa 100%);
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 680px;
+            z-index: 2;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            background: var(--ts-green-light);
+            border: 1px solid #b9f5d0;
+            color: var(--ts-green-dark);
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 237, 100, 0.15);
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ts-green);
+            box-shadow: 0 0 0 3px rgba(0, 237, 100, 0.3);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 5vw, 68px);
+            line-height: 1.08;
+            letter-spacing: -0.04em;
+            margin-bottom: 24px;
+            font-weight: 900;
+            color: var(--ts-dark);
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #00684a 0%, #00b34d 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-description {
+            font-size: clamp(16px, 1.8vw, 19px);
+            color: var(--ts-gray-600);
+            max-width: 580px;
+            margin-bottom: 36px;
+            line-height: 1.65;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 26px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hero-btn:active {
+            transform: scale(0.97);
+        }
+
+        .hero-primary {
+            background: var(--ts-dark);
+            color: white;
+            box-shadow: 0 6px 20px rgba(0, 30, 43, 0.25);
+        }
+
+        .hero-primary:hover {
+            background: #00384a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 30, 43, 0.35);
+        }
+
+        .hero-secondary {
+            border: 1.5px solid var(--ts-gray-200);
+            background: white;
+            color: var(--ts-dark);
+        }
+
+        .hero-secondary:hover {
+            border-color: var(--ts-dark);
+            background: var(--ts-gray-50);
+            transform: translateY(-2px);
+        }
+
+        /* ================= PLATFORM MOCKUP ================= */
+        .product-wrapper {
+            position: relative;
+            width: 100%;
+            z-index: 2;
+        }
+
+        .dashboard {
+            background: var(--ts-dark);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow:
+                0 30px 70px rgba(0, 30, 43, 0.22),
+                0 10px 24px rgba(0, 30, 43, 0.12),
+                0 0 0 1px rgba(255, 255, 255, 0.08);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dashboard:hover {
+            transform: translateY(-4px);
+        }
+
+        .dashboard-top {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            padding: 0 18px;
+            gap: 8px;
+            background: #08232e;
+            border-bottom: 1px solid #143542;
+        }
+
+        .window-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #395460;
+            transition: background 0.2s ease;
+        }
+
+        .window-dot:nth-child(1) { background: #ff5f56; }
+        .window-dot:nth-child(2) { background: #ffbd2e; }
+        .window-dot:nth-child(3) { background: #27c93f; }
+
+        .dashboard-body {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            min-height: 380px;
+        }
+
+        .sidebar {
+            background: #051b24;
+            padding: 20px 12px;
+            border-right: 1px solid #143542;
+        }
+
+        .side-title {
+            color: var(--ts-gray-400);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin: 10px 8px 6px;
+        }
+
+        .side-item {
+            color: #9cb0b7;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 3px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .side-item:hover {
+            color: white;
+            background: #0a2e3b;
+        }
+
+        .side-item.active {
+            background: #0e3a48;
+            color: var(--ts-green);
+            font-weight: 700;
+        }
+
+        .main-dashboard {
+            padding: 24px;
+            background: #f4f8f7;
+            overflow: hidden;
+        }
+
+        .dash-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .dash-heading h3 {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--ts-dark);
+        }
+
+        .status {
+            background: #e3fff0;
+            color: var(--ts-green-dark);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            border: 1px solid #b7f3cf;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric {
+            background: white;
+            border: 1px solid var(--ts-gray-200);
+            padding: 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 30, 43, 0.03);
+            transition: transform 0.2s ease;
+        }
+
+        .metric:hover {
+            transform: translateY(-2px);
+            border-color: #b5dcca;
+        }
+
+        .metric small {
+            color: var(--ts-gray-600);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--ts-dark);
+            margin-top: 4px;
+        }
+
+        .chart {
+            background: white;
+            border: 1px solid var(--ts-gray-200);
+            border-radius: 10px;
+            height: 180px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ts-gray-600);
+        }
+
+        .chart-line {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 20px;
+            height: 110px;
+        }
+
+        .chart-line svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ================= TRUST ================= */
+        .trust {
+            padding: 45px clamp(16px, 6vw, 80px);
+            border-top: 1px solid #edf0ef;
+            border-bottom: 1px solid #edf0ef;
+            background: white;
+            text-align: center;
+        }
+
+        .trust p {
+            color: var(--ts-gray-600);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 22px;
+        }
+
+        .trust-items {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(24px, 5vw, 60px);
+            flex-wrap: wrap;
+            color: #6d828a;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .trust-badge-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--ts-gray-50);
+            border: 1px solid var(--ts-gray-200);
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ts-dark);
+            transition: all 0.25s ease;
+        }
+
+        .trust-badge-item:hover {
+            border-color: var(--ts-green);
+            background: var(--ts-green-light);
+            color: var(--ts-green-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ================= SECTIONS COMMON ================= */
+        .section {
+            padding: clamp(60px, 10vh, 100px) clamp(16px, 6vw, 80px);
+        }
+
+        .section-header {
+            max-width: 720px;
+            margin-bottom: clamp(36px, 6vh, 55px);
+        }
+
+        .eyebrow {
+            color: var(--ts-green-dark);
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .section-header h2 {
+            font-size: clamp(28px, 4vw, 48px);
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+            font-weight: 900;
+            color: var(--ts-dark);
+        }
+
+        .section-header p {
+            color: var(--ts-gray-600);
+            font-size: clamp(15px, 1.6vw, 18px);
+            line-height: 1.65;
+        }
+
+        /* ================= FEATURES ================= */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            border: 1px solid var(--ts-gray-200);
+            border-radius: var(--ts-radius);
+            padding: clamp(24px, 4vw, 34px);
+            background: white;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0, 30, 43, 0.08);
+            border-color: #b5dcca;
+        }
+
+        .feature-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: var(--ts-green-light);
+            color: var(--ts-green-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 22px;
+            border: 1px solid #c0f4d3;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(4deg);
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--ts-dark);
+        }
+
+        .feature-card p {
+            color: var(--ts-gray-600);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .learn {
+            margin-top: auto;
+            color: var(--ts-green-dark);
+            font-size: 14px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.2s ease;
+        }
+
+        .feature-card:hover .learn {
+            gap: 10px;
+            color: var(--ts-green);
+        }
+
+        /* ================= DARK SECTION ================= */
+        .dark-section {
+            background: var(--ts-dark);
+            color: white;
+            padding: clamp(60px, 10vh, 100px) clamp(16px, 6vw, 80px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark-section::before {
+            content: '';
+            position: absolute;
+            top: -150px;
+            right: -150px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 237, 100, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .dark-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(40px, 6vw, 80px);
+            align-items: center;
+        }
+
+        .dark-section .eyebrow {
+            color: var(--ts-green);
+        }
+
+        .dark-section h2 {
+            font-size: clamp(28px, 4vw, 48px);
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            font-weight: 900;
+            color: white;
+        }
+
+        .dark-section p {
+            color: #b7c6ca;
+            font-size: clamp(15px, 1.6vw, 17px);
+            line-height: 1.65;
+            max-width: 560px;
+        }
+
+        .code-box {
+            background: #051a23;
+            border: 1px solid var(--ts-dark-border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .code-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--ts-dark-border);
+            color: #8ea4aa;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #07222d;
+        }
+
+        .workflow-steps {
+            padding: 28px 24px;
+            position: relative;
+        }
+
+        .workflow-step {
+            display: flex;
+            gap: 18px;
+            position: relative;
+            padding-bottom: 30px;
+            transition: transform 0.2s ease;
+        }
+
+        .workflow-step:last-child {
+            padding-bottom: 0;
+        }
+
+        .workflow-step::before {
+            content: '';
+            position: absolute;
+            left: 17px;
+            top: 36px;
+            bottom: -2px;
+            width: 2px;
+            background: #193f4c;
+        }
+
+        .workflow-step:last-child::before {
+            display: none;
+        }
+
+        .step-num {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #07232e;
+            border: 2px solid var(--ts-green);
+            color: var(--ts-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 900;
+            z-index: 1;
+            box-shadow: 0 0 12px rgba(0, 237, 100, 0.2);
+            transition: all 0.25s ease;
+        }
+
+        .workflow-step:hover .step-num {
+            background: var(--ts-green);
+            color: var(--ts-dark);
+            transform: scale(1.1);
+        }
+
+        .step-content h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .step-content p {
+            font-size: 13px;
+            color: #8ea4aa;
+            line-height: 1.55;
+        }
+
+        /* ================= CTA ================= */
+        .cta {
+            padding: clamp(60px, 10vh, 100px) clamp(16px, 6vw, 80px);
+            text-align: center;
+            background: linear-gradient(180deg, #f4f8f6 0%, #eaf4f0 100%);
+            position: relative;
+        }
+
+        .cta h2 {
+            font-size: clamp(28px, 4.5vw, 50px);
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+            font-weight: 900;
+            color: var(--ts-dark);
+        }
+
+        .cta p {
+            color: var(--ts-gray-600);
+            margin: 0 auto 32px;
+            max-width: 600px;
+            font-size: clamp(15px, 1.6vw, 18px);
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            background: var(--ts-dark);
+            color: white;
+            padding: clamp(50px, 8vh, 70px) clamp(16px, 6vw, 80px) 30px;
+            border-top: 1px solid var(--ts-dark-border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: clamp(30px, 5vw, 60px);
+            padding-bottom: 45px;
+        }
+
+        .footer-brand .brand {
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            color: #8fa5ab;
+            max-width: 320px;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+
+        .footer-column h4 {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: white;
+            margin-bottom: 18px;
+        }
+
+        .footer-column a {
+            display: block;
+            color: #8fa5ab;
+            font-size: 14px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--ts-green);
+            transform: translateX(3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #143743;
+            padding-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #71888f;
+            font-size: 13px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--ts-dark);
+            color: var(--ts-green);
+            border: 2px solid var(--ts-green);
+            box-shadow: 0 8px 20px rgba(0, 30, 43, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 990;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            background: var(--ts-green);
+            color: var(--ts-dark);
+            transform: translateY(-3px);
+        }
+
+        /* ================= RESPONSIVE BREAKPOINTS ================= */
+
+        /* Tablets & Small Laptops (<= 1024px) */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding-top: 50px;
+                gap: 50px;
+            }
+
+            .hero-content {
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .product-wrapper {
+                max-width: 700px;
+                margin: 0 auto;
+            }
+
+            .dark-grid {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .dark-section .eyebrow,
+            .dark-section h2,
+            .dark-section p {
+                text-align: center;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+            }
+        }
+
+        /* Tablets & Mobile (<= 850px) */
+        @media (max-width: 850px) {
+            .nav-links {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-actions .btn-outline {
+                display: none;
+            }
+        }
+
+        /* Mobile Devices (<= 640px) */
+        @media (max-width: 640px) {
+            .navbar {
+                height: 64px;
+            }
+
+            .brand {
+                font-size: 19px;
+            }
+
+            .brand-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .hero {
+                padding-top: 36px;
+                padding-bottom: 50px;
+            }
+
+            .hero h1 {
+                font-size: 34px;
+                letter-spacing: -0.03em;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .hero-btn {
+                width: 100%;
+            }
+
+            .dashboard-body {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 10px 14px;
+                gap: 8px;
+                border-right: none;
+                border-bottom: 1px solid #143542;
+            }
+
+            .side-title {
+                display: none;
+            }
+
+            .side-item {
+                white-space: nowrap;
+                padding: 6px 12px;
+                font-size: 11px;
+                margin-bottom: 0;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .feature-card {
+                padding: 22px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+            }
+        }
+
+        /* Small Mobile Devices (<= 400px) */
+        @media (max-width: 400px) {
+            .brand {
+                font-size: 17px;
+                gap: 8px;
+            }
+
+            .brand-icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            .btn {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+
+            .hero h1 {
+                font-size: 29px;
+            }
+
+            .workflow-step {
+                gap: 12px;
+            }
+
+            .step-num {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+
+            .workflow-step::before {
+                left: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <nav class="navbar" id="navbar">
+        <!-- Brand -->
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <div class="nav-links">
+            <a href="#platform">Platform</a>
+            <a href="#solutions">Solutions</a>
+            <a href="#developers">How It Works</a>
+            <a href="/docs/digital-verification">Docs</a>
+            <a href="#company">About</a>
+        </div>
+
+        <!-- Action Buttons & Hamburger -->
+        <div class="nav-actions">
+            <a href="/login" class="btn btn-outline">Log In</a>
+            <a href="/signup" class="btn btn-primary">Get Started</a>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-drawer-backdrop" id="drawerBackdrop"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <div class="mobile-drawer-header">
+            <a href="/" class="brand">
+                <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon" style="width: 36px; height: 36px;">
+                <span>TrueScale</span>
+            </a>
+        </div>
+        <div class="mobile-drawer-links">
+            <a href="#platform" class="drawer-link">Platform <span>→</span></a>
+            <a href="#solutions" class="drawer-link">Solutions <span>→</span></a>
+            <a href="#developers" class="drawer-link">How It Works <span>→</span></a>
+            <a href="/docs/digital-verification" class="drawer-link">Documentation <span>→</span></a>
+            <a href="#company" class="drawer-link">About TrueScale <span>→</span></a>
+        </div>
+        <div class="mobile-drawer-actions">
+            <a href="/login" class="btn btn-outline">Log In</a>
+            <a href="/signup" class="btn btn-primary">Register Your Instrument</a>
+        </div>
+    </div>
+
+    <!-- ================= HERO ================= -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="badge">
+                <span class="badge-dot"></span>
+                Trusted instrument verification platform
+            </div>
+
+            <h1>
+                Verify with confidence.
+                <span>Certify with trust.</span>
+            </h1>
+
+            <p class="hero-description">
+                TrueScale is a digital instrument verification platform that
+                connects instrument owners, administrators and inspectors
+                to make verification faster, transparent and reliable.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="/login" class="hero-btn hero-primary">
+                    Apply for Verification →
+                </a>
+                <a href="#developers" class="hero-btn hero-secondary">
+                    Explore How It Works
+                </a>
+            </div>
+        </div>
+
+        <!-- Interactive Platform Dashboard Preview -->
+        <div class="product-wrapper">
+            <div class="dashboard">
+                <div class="dashboard-top">
+                    <span class="window-dot"></span>
+                    <span class="window-dot"></span>
+                    <span class="window-dot"></span>
+                </div>
+
+                <div class="dashboard-body">
+                    <aside class="sidebar">
+                        <div class="side-title">Verification</div>
+                        <div class="side-item active">Dashboard</div>
+                        <div class="side-item">Instruments</div>
+                        <div class="side-item">Requests</div>
+                        <div class="side-item">Reports</div>
+                        <div class="side-title">Account</div>
+                        <div class="side-item">Profile</div>
+                    </aside>
+
+                    <main class="main-dashboard">
+                        <div class="dash-heading">
+                            <h3>Verification Dashboard</h3>
+                            <span class="status">● System Active</span>
+                        </div>
+
+                        <div class="metrics">
+                            <div class="metric">
+                                <small>Pending Requests</small>
+                                <strong>128</strong>
+                            </div>
+                            <div class="metric">
+                                <small>Inspections</small>
+                                <strong>86</strong>
+                            </div>
+                            <div class="metric">
+                                <small>Certificates</small>
+                                <strong>74</strong>
+                            </div>
+                        </div>
+
+                        <div class="chart">
+                            <div class="chart-title">Verification Activity Trends</div>
+                            <div class="chart-line">
+                                <svg viewBox="0 0 500 130" preserveAspectRatio="none">
+                                    <defs>
+                                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#00ed64" stop-opacity="0.25"/>
+                                            <stop offset="100%" stop-color="#00ed64" stop-opacity="0.0"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <polygon points="0,110 50,90 90,100 140,60 190,75 240,35 290,55 340,30 390,45 440,15 500,25 500,130 0,130" fill="url(#chartGrad)" />
+                                    <polyline
+                                        points="0,110 50,90 90,100 140,60 190,75 240,35 290,55 340,30 390,45 440,15 500,25"
+                                        fill="none"
+                                        stroke="#00ed64"
+                                        stroke-width="3.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= TRUST ================= -->
+    <section class="trust">
+        <p>STREAMLINING INSTRUMENT VERIFICATION AND COMPLIANCE</p>
+        <div class="trust-items">
+            <span class="trust-badge-item">⚖️ OWNERS</span>
+            <span class="trust-badge-item">🔍 INSPECTORS</span>
+            <span class="trust-badge-item">🛡️ ADMIN</span>
+            <span class="trust-badge-item">📜 CERTIFICATES</span>
+            <span class="trust-badge-item">✅ COMPLIANCE</span>
+        </div>
+    </section>
+
+    <!-- ================= PLATFORM ================= -->
+    <section class="section" id="platform">
+        <div class="section-header">
+            <div class="eyebrow">One trusted verification platform</div>
+            <h2>Everything you need for reliable instrument verification.</h2>
+            <p>
+                From registration to certification, TrueScale gives owners,
+                administrators and inspectors the tools and visibility
+                needed to complete verification efficiently.
+            </p>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">◈</div>
+                <h3>Digital Verification</h3>
+                <p>Submit instrument details digitally and manage the complete verification request from one unified portal.</p>
+                <a href="/docs/digital-verification" class="learn">Learn more →</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Inspector Assignment</h3>
+                <p>Assign qualified inspectors based on location and workload for rapid, efficient field inspections.</p>
+                <a href="/docs/inspector-assignment" class="learn">Learn more →</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">◉</div>
+                <h3>Real-Time Status</h3>
+                <p>Track verification requests, inspection milestones, and certificate approvals in real time.</p>
+                <a href="/login" class="learn">Track status →</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Role-Based Access</h3>
+                <p>Ensure strict separation of responsibilities with customized portals for Owners, Admins, and Field Inspectors.</p>
+                <a href="/login" class="learn">Learn more →</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">☁</div>
+                <h3>Digital Certificates</h3>
+                <p>Generate tamper-proof cryptographic digital certificates with verifiable audit trails upon inspection approval.</p>
+                <a href="/docs/digital-certificate" class="learn">Learn more →</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">&lt;/&gt;</div>
+                <h3>QR Verification</h3>
+                <p>Instantly verify certificate authenticity and instrument compliance on-site via mobile QR scanning.</p>
+                <a href="/docs/qr-verification" class="learn">Learn more →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= DEVELOPER / WORKFLOW SECTION ================= -->
+    <section class="dark-section" id="developers">
+        <div class="dark-grid">
+            <div>
+                <div class="eyebrow">Verification Workflow</div>
+                <h2>Verify instruments with confidence.</h2>
+                <p>
+                    TrueScale connects every stage of the verification workflow,
+                    from owner registration and application to inspection,
+                    admin approval and digital certification.
+                </p>
+            </div>
+
+            <div class="code-box">
+                <div class="code-header">
+                    <span>Instrument Verification Workflow</span>
+                    <span style="color: var(--ts-green); font-size: 11px;">6 Steps • Standardized</span>
+                </div>
+
+                <div class="workflow-steps">
+                    <div class="workflow-step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <h4>Owner Registration</h4>
+                            <p>Business owner registers and submits weighing or measuring instrument details.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <h4>Application Submission</h4>
+                            <p>Owner applies for verification and uploads required verification documentation.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <h4>Inspector Assignment</h4>
+                            <p>Application is routed to a Legal Metrology inspector for scheduling and review.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <h4>Physical Inspection & Testing</h4>
+                            <p>Inspector examines and tests instrument accuracy and compliance on-site.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-num">5</div>
+                        <div class="step-content">
+                            <h4>Admin Review & Approval</h4>
+                            <p>Admin verifies inspection data and approves or requests remediation.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-num">6</div>
+                        <div class="step-content">
+                            <h4>Digital Certificate Issuance</h4>
+                            <p>A digital verification certificate with a unique QR code is generated instantly.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= SOLUTIONS ================= -->
+    <section class="section" id="solutions">
+        <div class="section-header">
+            <div class="eyebrow">Built for every role</div>
+            <h2>One workflow for every stakeholder.</h2>
+            <p>
+                Whether you own an instrument, manage verification requests,
+                or perform field inspections, TrueScale gives every role
+                the tools needed to complete the process.
+            </p>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3>Instrument Owners</h3>
+                <p>Register instruments, apply for verification, track real-time status, receive digital certificates, and access QR verification.</p>
+                <a href="/signup" class="learn">Register now →</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👨‍💻</div>
+                <h3>Administrators</h3>
+                <p>Validate requests, assign inspectors by district, review inspection reports, issue digital certificates, and monitor compliance.</p>
+                <a href="/login" class="learn">Admin portal →</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🏢</div>
+                <h3>Inspectors</h3>
+                <p>View assigned tasks, navigate to instrument locations, record measurements, upload test photos, and submit field reports.</p>
+                <a href="/login" class="learn">Inspector portal →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= CTA ================= -->
+    <section class="cta">
+        <div class="eyebrow">Start Verification</div>
+        <h2>Ready to verify with TrueScale?</h2>
+        <p>
+            Create your account and start managing instrument verification
+            through a transparent workflow built for Owners, Admins and Inspectors.
+        </p>
+        <a href="/signup" class="hero-btn hero-primary" style="font-size: 16px; padding: 16px 32px;">
+            Register Your Instrument →
+        </a>
+    </section>
+
+    <!-- ================= FOOTER ================= -->
+    <footer id="company">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="brand">
+                    <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+                    <span>TrueScale</span>
+                </a>
+                <p>A modern digital platform for instrument verification, inspection, certification and compliance.</p>
+            </div>
+
+            <div class="footer-column">
+                <h4>PLATFORM</h4>
+                <a href="#platform">Platform Features</a>
+                <a href="/docs/digital-verification">Digital Verification</a>
+                <a href="/docs/digital-certificate">Certificates</a>
+                <a href="/docs/qr-verification">QR Verification</a>
+            </div>
+
+            <div class="footer-column">
+                <h4>ROLES & DOCS</h4>
+                <a href="/docs/digital-verification">Owner Workflow</a>
+                <a href="/docs/inspector-assignment">Inspector Workflow</a>
+                <a href="/docs/digital-certificate">Verification Process</a>
+                <a href="/login">Portal Login</a>
+            </div>
+
+            <div class="footer-column">
+                <h4>COMPANY</h4>
+                <a href="#company">About TrueScale</a>
+                <a href="/login">Contact Support</a>
+                <a href="/signup">Create Account</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© <%= new Date().getFullYear() %> TrueScale. All rights reserved.</span>
+            <span>Built for trusted verification & compliance.</span>
+        </div>
+    </footer>
+
+    <!-- Back to top floating button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+    <!-- ================= INTERACTIVE JAVASCRIPT ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.getElementById('navbar');
+            const menuToggle = document.getElementById('menuToggle');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            const drawerBackdrop = document.getElementById('drawerBackdrop');
+            const drawerLinks = document.querySelectorAll('.drawer-link');
+            const backToTop = document.getElementById('backToTop');
+
+            // Scroll events for navbar and back-to-top button
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 30) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+
+                if (window.scrollY > 400) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            }, { passive: true });
+
+            // Back to top click
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Toggle Mobile Drawer
+            function openDrawer() {
+                mobileDrawer.classList.add('active');
+                drawerBackdrop.classList.add('active');
+                menuToggle.classList.add('active');
+                menuToggle.setAttribute('aria-expanded', 'true');
+                document.body.classList.add('menu-open');
+            }
+
+            function closeDrawer() {
+                mobileDrawer.classList.remove('active');
+                drawerBackdrop.classList.remove('active');
+                menuToggle.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+                document.body.classList.remove('menu-open');
+            }
+
+            menuToggle.addEventListener('click', () => {
+                if (mobileDrawer.classList.contains('active')) {
+                    closeDrawer();
+                } else {
+                    openDrawer();
+                }
+            });
+
+            drawerBackdrop.addEventListener('click', closeDrawer);
+
+            drawerLinks.forEach(link => {
+                link.addEventListener('click', closeDrawer);
+            });
+
+            // Close drawer on ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && mobileDrawer.classList.contains('active')) {
+                    closeDrawer();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

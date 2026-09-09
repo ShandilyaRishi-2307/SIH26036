@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>My Instruments — TrueScale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ts-dark: #001e2b;
+            --ts-green: #00ed64;
+            --ts-green-dark: #00684a;
+            --ts-green-light: #e8fff1;
+            --ts-gray-50: #f8fbfa;
+            --ts-gray-100: #eef3f2;
+            --ts-gray-200: #dfe7e4;
+            --ts-gray-400: #8ea4aa;
+            --ts-gray-600: #52656d;
+            --ts-radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            min-height: 100dvh;
+            background-color: var(--ts-gray-50);
+            color: var(--ts-dark);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            min-height: 100dvh;
+            background-color: var(--ts-dark);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100dvh;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 36px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .brand:hover .brand-icon {
+            transform: scale(1.08) rotate(-3deg);
+        }
+
+        .side-title {
+            color: #5c7983;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin: 12px 10px 8px;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #b8c8cc;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: #08232e;
+            color: white;
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: #0b2f38;
+            color: var(--ts-green);
+            font-weight: 700;
+            box-shadow: inset 3px 0 0 var(--ts-green);
+        }
+
+        .sidebar-logout {
+            margin-top: auto;
+            color: #ff6b6b;
+            padding: 12px 16px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-logout:hover {
+            background: rgba(255, 107, 107, 0.12);
+            color: #ff8585;
+        }
+
+        /* Mobile Header & Drawer */
+        .mobile-topbar {
+            display: none;
+            height: 64px;
+            background: var(--ts-dark);
+            color: white;
+            padding: 0 18px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .mobile-topbar .brand {
+            margin-bottom: 0;
+            font-size: 19px;
+            gap: 10px;
+        }
+
+        .mobile-topbar .brand-icon {
+            width: 34px;
+            height: 34px;
+        }
+
+        .mobile-menu-btn {
+            background: #082833;
+            border: 1px solid #14404f;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .drawer-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 20, 28, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1100;
+        }
+
+        .drawer-backdrop.active {
+            display: block;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: min(80vw, 300px);
+            height: 100dvh;
+            background: var(--ts-dark);
+            z-index: 1150;
+            padding: 24px 18px;
+            display: flex;
+            flex-direction: column;
+            transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .mobile-drawer.active {
+            left: 0;
+        }
+
+        .drawer-close {
+            align-self: flex-end;
+            background: transparent;
+            border: none;
+            color: #8ea4aa;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: clamp(20px, 4vw, 40px) clamp(16px, 5vw, 60px);
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: clamp(24px, 4vh, 36px);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: clamp(24px, 3vw, 32px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--ts-dark);
+        }
+
+        .btn-new {
+            padding: 12px 22px;
+            background-color: var(--ts-green);
+            color: var(--ts-dark);
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(0, 237, 100, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .btn-new:hover {
+            background-color: #00d65a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 237, 100, 0.4);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--ts-radius);
+            padding: 24px;
+            border: 1px solid var(--ts-gray-200);
+            box-shadow: 0 4px 15px rgba(0, 30, 43, 0.03);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 30, 43, 0.08);
+            border-color: #b5dcca;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--ts-dark);
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .card-id {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ts-gray-600);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            background: var(--ts-gray-100);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .card-body {
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #edf0ef;
+            padding-bottom: 8px;
+        }
+
+        .detail-label {
+            color: var(--ts-gray-600);
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: var(--ts-dark);
+            text-align: right;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #edf0ef;
+            padding-top: 14px;
+            margin-top: auto;
+        }
+
+        .status-tag {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .status-certified {
+            background: var(--ts-green-light);
+            color: var(--ts-green-dark);
+            border: 1px solid #b9f5d0;
+        }
+
+        .pay-tag {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 5px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .pay-paid {
+            background: var(--ts-dark);
+            color: var(--ts-green);
+        }
+
+        .pay-unpaid {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: clamp(40px, 8vh, 70px) 20px;
+            background: white;
+            border-radius: var(--ts-radius);
+            border: 1.5px dashed var(--ts-gray-200);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--ts-dark);
+        }
+
+        .empty-state p {
+            color: var(--ts-gray-600);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        /* Mobile Breakpoint */
+        @media (max-width: 900px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .main-content {
+                padding: 24px 16px 40px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                margin-bottom: 20px;
+            }
+
+            .btn-new {
+                justify-content: center;
+                width: 100%;
+                padding: 12px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Topbar -->
+    <header class="mobile-topbar">
+        <button class="mobile-menu-btn" id="drawerOpenBtn" aria-label="Open menu">☰</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <a href="/owner/<%= userId %>/apply" style="color: var(--ts-green); font-size: 20px; font-weight: 800; text-decoration: none;">+</a>
+    </header>
+
+    <!-- Mobile Drawer -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <div class="mobile-drawer" id="mobileDrawer">
+        <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">OWNER PORTAL</div>
+        <a href="/owner/<%= userId %>" class="nav-item">📊 Dashboard</a>
+        <a href="/owner/<%= userId %>/instruments" class="nav-item active">⚖️ My Instruments</a>
+        <a href="/owner/<%= userId %>/apply" class="nav-item">📝 Apply for Verification</a>
+        <a href="/owner/<%= userId %>/status" class="nav-item">⏱️ Application Status</a>
+        <a href="/owner/<%= userId %>/due-verifications" class="nav-item">🔔 Due Verifications</a>
+        <a href="/owner/<%= userId %>/certificates" class="nav-item">📜 Certificates</a>
+        <a id="mobile-sidebar-logout-btn" class="sidebar-logout">🚪 Log Out</a>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="sidebar">
+        <a href="/" class="brand">
+            <img src="/images/logo.jpeg" alt="TrueScale Logo" class="brand-icon">
+            <span>TrueScale</span>
+        </a>
+        <div class="side-title">OWNER PORTAL</div>
+        <a href="/owner/<%= userId %>" class="nav-item">📊 Dashboard</a>
+        <a href="/owner/<%= userId %>/instruments" class="nav-item active">⚖️ My Instruments</a>
+        <a href="/owner/<%= userId %>/apply" class="nav-item">📝 Apply for Verification</a>
+        <a href="/owner/<%= userId %>/status" class="nav-item">⏱️ Application Status</a>
+        <a href="/owner/<%= userId %>/due-verifications" class="nav-item">🔔 Due Verifications</a>
+        <a href="/owner/<%= userId %>/certificates" class="nav-item">📜 Certificates</a>
+        <a id="sidebar-logout-btn" class="sidebar-logout">🚪 Log Out</a>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>My Instruments</h1>
+            <a href="/owner/<%= userId %>/apply" class="btn-new">+ Register New Instrument</a>
+        </header>
+
+        <% if (instruments.length > 0) { %>
+            <div class="cards-grid">
+                <% instruments.forEach(function(instrument) { %>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title"><%= instrument.instrumentName || instrument.type %></h3>
+                                <span class="card-id"><%= instrument.instrumentId %></span>
+                            </div>
+                            <span class="pay-tag <%= instrument.paymentStatus === 'Paid' ? 'pay-paid' : 'pay-unpaid' %>">
+                                <%= instrument.paymentStatus === 'Paid' ? '✓ PAID' : 'PENDING PAY' %>
+                            </span>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="detail-row">
+                                <span class="detail-label">Type</span>
+                                <span class="detail-value"><%= instrument.type %></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Brand / Model</span>
+                                <span class="detail-value"><%= instrument.company || 'N/A' %> / <%= instrument.modelNo || 'N/A' %></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Location</span>
+                                <span class="detail-value"><%= instrument.address ? (instrument.address.locality || instrument.address.city || instrument.address.district || 'Registered Location') : 'N/A' %></span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <span class="status-tag <%= instrument.status === 'Certified' ? 'status-certified' : 'status-pending' %>">
+                                <%= instrument.status %>
+                            </span>
+                            <span style="font-size: 12px; color: var(--ts-gray-600); font-weight: 600;">
+                                <%= instrument.dateSubmitted ? new Date(instrument.dateSubmitted).toLocaleDateString('en-GB') : 'N/A' %>
+                            </span>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <h3>No Instruments Found</h3>
+                <p>You haven't registered any instruments for verification yet.</p>
+                <a href="/owner/<%= userId %>/apply" class="btn-new">Register Your First Instrument →</a>
+            </div>
+        <% } %>
+    </main>
+
+    <script>
+        const drawerOpenBtn = document.getElementById('drawerOpenBtn');
+        const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        const drawerBackdrop = document.getElementById('drawerBackdrop');
+
+        function openDrawer() {
+            mobileDrawer.classList.add('active');
+            drawerBackdrop.classList.add('active');
+        }
+
+        function closeDrawer() {
+            mobileDrawer.classList.remove('active');
+            drawerBackdrop.classList.remove('active');
+        }
+
+        if (drawerOpenBtn) drawerOpenBtn.addEventListener('click', openDrawer);
+        if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+        if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+    </script>
+
+    <!-- Logout Logic -->
+    <script id="firebase-config" type="application/json"><%- JSON.stringify(firebaseConfig) %></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        const configText = document.getElementById('firebase-config').textContent;
+        const app = initializeApp(JSON.parse(configText));
+        const auth = getAuth(app);
+
+        const handleLogout = () => {
+            signOut(auth).then(() => {
+                document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                window.location.href = '/login';
+            });
+        };
+
+        const sidebarLogoutBtn = document.getElementById('sidebar-logout-btn');
+        const mobileSidebarLogoutBtn = document.getElementById('mobile-sidebar-logout-btn');
+
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', handleLogout);
+        if (mobileSidebarLogoutBtn) mobileSidebarLogoutBtn.addEventListener('click', handleLogout);
+    </script>
+</body>
+</html>
