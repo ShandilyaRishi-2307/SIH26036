@@ -39,32 +39,35 @@ const upload = multer({
 const MONGODB_URI = (process.env.MONGODB_URI || 'mongodb://localhost:27017/truescale').trim();
 
 mongoose.connection.on('connected', () => console.log('✅ Connected to MongoDB successfully. ReadyState: 1'));
-mongoose.connection.on('error', (err) => console.error('❌ MongoDB runtime error:', err.message));
+mongoose.connection.on('error', (err) => console.error('❌ MongoDB runtime error:', err.message || err));
 mongoose.connection.on('disconnected', () => console.warn('⚠️ MongoDB disconnected. Mongoose will attempt auto-reconnect.'));
 
 mongoose.connect(MONGODB_URI, {
     serverSelectionTimeoutMS: 10000,
     socketTimeoutMS: 45000,
 })
-    .catch((err) => console.error('❌ Initial MongoDB connection error:', err.message));
+    .catch((err) => console.error('❌ Initial MongoDB connection error:', err.message || err));
 
 const firebaseConfig = {
     apiKey: (process.env.FIREBASE_API_KEY || '').trim(),
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN || '',
-    projectId: process.env.FIREBASE_PROJECT_ID || '',
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || '',
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '',
-    appId: process.env.FIREBASE_APP_ID || ''
+    authDomain: (process.env.FIREBASE_AUTH_DOMAIN || '').trim(),
+    projectId: (process.env.FIREBASE_PROJECT_ID || '').trim(),
+    storageBucket: (process.env.FIREBASE_STORAGE_BUCKET || '').trim(),
+    messagingSenderId: (process.env.FIREBASE_MESSAGING_SENDER_ID || '').trim(),
+    appId: (process.env.FIREBASE_APP_ID || '').trim()
 };
 app.locals.firebaseConfig = firebaseConfig;
 
-// --- Health Check for Deployment (Render/Railway/AWS/GCP/Vercel) ---
+// Health check endpoint for deployment monitoring
 app.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'healthy',
+    const dbState = mongoose.connection.readyState;
+    const states = ['Disconnected', 'Connected', 'Connecting', 'Disconnecting'];
+    res.status(dbState === 1 ? 200 : 503).json({
+        status: dbState === 1 ? 'healthy' : 'degraded',
         service: 'TrueScale Platform',
-        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-        timestamp: new Date().toISOString()
+        database: states[dbState] || 'Unknown',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
     });
 });
 
@@ -84,19 +87,26 @@ app.get('/login', (req, res) => res.render('login', { firebaseConfig }));
 
 app.post('/api/users', verifyToken, async (req, res) => {
     try {
-        const existingUser = await User.findOne({ firebaseUid: req.user.uid });
-        if (existingUser) {
-            return res.status(200).json({ success: true, user: existingUser });
+        let user = await User.findOne({ firebaseUid: req.user.uid });
+        if (!user && req.user.email) {
+            user = await User.findOne({ email: req.user.email });
+            if (user) {
+                user.firebaseUid = req.user.uid;
+                await user.save();
+                return res.status(200).json({ success: true, user });
+            }
         }
-        const newUser = new User({ 
-            firebaseUid: req.user.uid, 
-            email: req.user.email, 
-            role: req.body.role || 'Owner' 
-        });
-        await newUser.save();
-        res.status(201).json({ success: true });
+        if (!user) {
+            user = new User({ 
+                firebaseUid: req.user.uid, 
+                email: req.user.email, 
+                role: req.body.role || 'Owner' 
+            });
+            await user.save();
+        }
+        res.status(201).json({ success: true, user });
     } catch (error) { 
-        console.error('Create User Error:', error);
+        console.error('Create/Update User Error:', error);
         res.status(500).json({ success: false, message: error.message }); 
     }
 });
@@ -104,21 +114,32 @@ app.post('/api/users', verifyToken, async (req, res) => {
 app.get('/auth/redirect', verifyToken, async (req, res) => {
     try {
         let user = await User.findOne({ firebaseUid: req.user.uid });
+
+        // Fallback: If user authenticated in Firebase but doesn't exist in MongoDB yet, provision them
+        if (!user && req.user.email) {
+            user = await User.findOne({ email: req.user.email });
+            if (user) {
+                user.firebaseUid = req.user.uid;
+                await user.save();
+            }
+        }
+
         if (!user) {
-            // Auto-provision user if logged in via Firebase but not in Mongo yet
+            console.log(`Auto-creating new Owner profile for Firebase UID: ${req.user.uid} (${req.user.email})`);
             user = new User({
                 firebaseUid: req.user.uid,
-                email: req.user.email,
+                email: req.user.email || 'unknown@truescale.com',
                 role: 'Owner'
             });
             await user.save();
         }
+
         if (user.role === 'Owner') return res.redirect(`/owner/${user._id}`);
         if (user.role === 'Inspector') return res.redirect(`/inspect/${user._id}`);
         res.redirect('/login');
     } catch (error) { 
-        console.error('Auth Redirect Error:', error);
-        res.status(500).send('Server Error'); 
+        console.error('CRITICAL Error in /auth/redirect:', error);
+        res.status(500).send(`Server Error: ${error.message || 'Error communicating with database.'}`); 
     }
 });
 

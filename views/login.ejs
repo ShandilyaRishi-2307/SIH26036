@@ -571,11 +571,13 @@
                 signInWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => userCredential.user.getIdToken())
                     .then((token) => {
-                        document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax`;
+                        const isSecure = window.location.protocol === 'https:' ? '; Secure' : '';
+                        document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
                         window.location.href = '/auth/redirect';
                     })
                     .catch((error) => {
-                        errorDiv.textContent = "Owner login failed. Please verify your email and password.";
+                        console.error('Firebase Auth Error:', error);
+                        errorDiv.textContent = error.message || "Owner login failed. Please verify your email and password.";
                         errorDiv.style.display = 'block';
                         loginBtn.disabled = false;
                         loginBtn.textContent = 'Log In to Portal →';

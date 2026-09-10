@@ -6,38 +6,48 @@ const { getAuth } = require('firebase-admin/auth');
 let app;
 
 if (!getApps().length) {
-    let credential;
+    let credential = null;
 
-    // 1. Check for complete service account JSON string in environment variable
+    // 1. Try loading from FIREBASE_SERVICE_ACCOUNT env var (JSON string)
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
         try {
             const parsed = typeof process.env.FIREBASE_SERVICE_ACCOUNT === 'string'
                 ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
                 : process.env.FIREBASE_SERVICE_ACCOUNT;
             credential = cert(parsed);
-        } catch (e) {
-            console.error('Error parsing FIREBASE_SERVICE_ACCOUNT environment variable:', e);
+            console.log('Firebase Admin initialized from FIREBASE_SERVICE_ACCOUNT env variable.');
+        } catch (err) {
+            console.error('Error parsing FIREBASE_SERVICE_ACCOUNT environment variable:', err.message);
         }
     }
 
-    // 2. Check for individual credentials in environment variables
-    if (!credential && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
-        credential = cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
-        });
+    // 2. Try loading from individual Firebase Admin env variables
+    if (!credential && process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+        try {
+            const privateKey = process.env.FIREBASE_PRIVATE_KEY.includes('\\n')
+                ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+                : process.env.FIREBASE_PRIVATE_KEY;
+            credential = cert({
+                projectId: process.env.FIREBASE_PROJECT_ID,
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                privateKey: privateKey
+            });
+            console.log('Firebase Admin initialized from individual Firebase environment variables.');
+        } catch (err) {
+            console.error('Error initializing Firebase Admin from individual env vars:', err.message);
+        }
     }
 
-    // 3. Check for local serviceAccountKey.json file (local development)
+    // 3. Try loading from local serviceAccountKey.json file if it exists
     if (!credential) {
-        const localKeyPath = path.join(__dirname, 'serviceAccountKey.json');
-        if (fs.existsSync(localKeyPath)) {
+        const keyPath = path.join(__dirname, 'serviceAccountKey.json');
+        if (fs.existsSync(keyPath)) {
             try {
-                const serviceAccount = JSON.parse(fs.readFileSync(localKeyPath, 'utf8'));
+                const serviceAccount = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
                 credential = cert(serviceAccount);
+                console.log('Firebase Admin initialized from serviceAccountKey.json file.');
             } catch (err) {
-                console.error('Error reading local serviceAccountKey.json:', err);
+                console.error('Error loading serviceAccountKey.json file:', err.message);
             }
         }
     }
