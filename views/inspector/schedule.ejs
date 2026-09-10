@@ -654,7 +654,7 @@
         </div>
     </main>
 
-    <!-- Mobile Drawer & Calendar Scripts -->
+    <script id="tasks-data" type="application/json"><%- tasksJson %></script>
     <script>
         const drawerOpenBtn = document.getElementById('drawerOpenBtn');
         const drawerCloseBtn = document.getElementById('drawerCloseBtn');
@@ -678,7 +678,12 @@
         if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
 
         // Calendar Engine
-        const allTasks = JSON.parse('<%- tasksJson %>');
+        let allTasks = [];
+        try {
+            allTasks = JSON.parse(document.getElementById('tasks-data').textContent || '[]');
+        } catch (e) {
+            console.error('Error parsing tasks json:', e);
+        }
         let currentDate = new Date(); 
         let selectedDateString = null; 
 

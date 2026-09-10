@@ -246,31 +246,30 @@
 
         <div class="grid">
             <% if (requests && requests.length > 0) { %>
-                <% requests.forEach(function(req) { %>
+                <% requests.forEach(function(inst) { %>
                     <div class="req-card">
                         <div class="req-header">
                             <div>
-                                <h2 style="font-size: 17px; font-weight: 800; color: white;"><%= req.instrument.instrumentName || req.instrument.type %></h2>
-                                <span style="font-size: 12px; color: var(--ts-muted);">Owner: <%= req.instrument.ownerName %></span>
+                                <h2 style="font-size: 17px; font-weight: 800; color: white;"><%= inst.instrumentName || inst.type %></h2>
+                                <span style="font-size: 12px; color: var(--ts-muted);">Owner: <%= inst.ownerName %></span>
                             </div>
-                            <span class="inst-id"><%= req.instrument.instrumentId %></span>
+                            <span class="inst-id"><%= inst.instrumentId %></span>
                         </div>
 
                         <div class="detail">
-                            <strong>Reason:</strong> <span class="reason-badge"><%= req.reason %></span>
+                            <strong>Reason:</strong> <span class="reason-badge"><%= inst.rejectionReason || 'Field Issue / Reschedule Requested' %></span>
                         </div>
 
                         <div class="detail">
-                            <strong>Location:</strong> <%= req.instrument.address ? req.instrument.address.city + ', ' + req.instrument.address.district : 'N/A' %>
+                            <strong>Location:</strong> <%= inst.address ? ((inst.address.locality ? inst.address.locality + ', ' : '') + inst.address.city + ', ' + inst.address.district) : 'N/A' %>
                         </div>
 
                         <div class="detail">
-                            <strong>Current Inspector:</strong> <%= req.inspector ? req.inspector.name : 'Unassigned' %>
+                            <strong>Current Inspector:</strong> <%= inst.assignedInspector ? inst.assignedInspector.name : 'Unassigned' %>
                         </div>
 
-                        <form action="/api/admin/resolve-reschedule" method="POST" class="form-group">
-                            <input type="hidden" name="requestId" value="<%= req._id %>">
-                            <input type="hidden" name="instrumentId" value="<%= req.instrument._id %>">
+                        <form action="/api/admin/process-reschedule" method="POST" class="form-group">
+                            <input type="hidden" name="instrumentId" value="<%= inst._id %>">
                             
                             <label>New Scheduled Date</label>
                             <input type="date" name="newDate" required>

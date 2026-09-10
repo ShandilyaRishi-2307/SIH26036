@@ -492,13 +492,14 @@
         </div>
     </div>
 
+    <script id="firebase-config" type="application/json"><%- JSON.stringify(firebaseConfig || {}) %></script>
     <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-        const firebaseConfig = JSON.parse('<%- JSON.stringify(firebaseConfig || {}) %>');
-        const app = initializeApp(firebaseConfig);
+        const configText = document.getElementById('firebase-config').textContent;
+        const app = initializeApp(JSON.parse(configText));
         const auth = getAuth(app);
 
         document.getElementById('signup-form').addEventListener('submit', (e) => {
@@ -518,7 +519,7 @@
                     const user = userCredential.user;
                     const token = await user.getIdToken();
 
-                    await fetch('/api/users', {
+                    const res = await fetch('/api/users', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -527,11 +528,20 @@
                         body: JSON.stringify({ role: 'Owner' })
                     });
 
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok || data.success === false) {
+                        throw new Error(data.message || 'Error initializing user profile on server.');
+                    }
+
                     await auth.signOut();
                     window.location.href = "/login";
                 })
                 .catch((error) => {
-                    errorDiv.textContent = error.message;
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorDiv.innerHTML = "This email is already registered. <a href='/login' style='color:#00ed64;font-weight:700;'>Log in to your account →</a>";
+                    } else {
+                        errorDiv.textContent = error.message;
+                    }
                     errorDiv.style.display = 'block';
                     signupBtn.disabled = false;
                     signupBtn.textContent = 'Create Account →';

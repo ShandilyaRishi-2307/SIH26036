@@ -420,10 +420,12 @@
 
         <div class="cert-grid">
             <% if (certificates && certificates.length > 0) { %>
-                <% certificates.forEach(function(cert) { %>
+                <% certificates.forEach(function(cert) { 
+                    if (!cert.instrument) return;
+                %>
                     <div class="cert-card">
                         <div class="cert-badge">VERIFIED</div>
-                        <h3 class="cert-title"><%= cert.instrument.instrumentName || cert.instrument.type %></h3>
+                        <h3 class="cert-title"><%= cert.instrument.instrumentName || cert.instrument.type || 'Verified Instrument' %></h3>
                         <div class="cert-no"><%= cert.certificateNumber %></div>
 
                         <div class="info-row">

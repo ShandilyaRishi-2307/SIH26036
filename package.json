@@ -2,11 +2,14 @@
   "name": "demo_project",
   "version": "1.0.0",
   "description": "This is the place where we build it in actual.",
-  "main": "index.js",
+  "main": "app.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon -e js,json,ejs,env app.js"
   },
   "repository": {
     "type": "git",

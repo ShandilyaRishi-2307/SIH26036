@@ -561,15 +561,17 @@
 
         <div class="report-grid">
             <% if (reports && reports.length > 0) { %>
-                <% reports.forEach(report => { %>
+                <% reports.forEach(report => { 
+                    if (!report.instrument) return;
+                %>
                     <div class="report-card">
                         <div class="card-header">
                             <div>
-                                <h2><%= report.instrument.instrumentName || report.instrument.type %></h2>
+                                <h2><%= report.instrument.instrumentName || report.instrument.type || 'Field Instrument' %></h2>
                                 <p style="color: var(--ts-muted); font-size: 14px;">ID: <strong style="color: white; font-family: monospace;"><%= report.instrument.instrumentId %></strong> | Owner: <strong style="color: white;"><%= report.instrument.ownerName %></strong></p>
                             </div>
                             <div class="inspector-tag">
-                                👤 Inspector: <%= report.inspector.name %>
+                                👤 Inspector: <%= report.inspector ? report.inspector.name : 'Assigned Inspector' %>
                             </div>
                         </div>
 

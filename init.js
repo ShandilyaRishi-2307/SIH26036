@@ -1,5 +1,12 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
+const dns = require('dns');
+
+try {
+    dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+} catch (e) {
+    // ignore if restricted
+}
 const User = require('./models/User');
 const Instrument = require('./models/Instrument');
 

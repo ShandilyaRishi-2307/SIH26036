@@ -24,7 +24,23 @@ const instrumentSchema = new mongoose.Schema({
     // 4. System Fields
     instrumentId: { type: String, required: true, unique: true }, 
     paymentStatus: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
-    status: { type: String, enum: ['Pending Inspection', 'Investigator Assigned', 'Document Approved', 'Certified', 'Rejected', 'Flagged'], default: 'Pending Inspection' },
+    status: { 
+        type: String, 
+        enum: [
+            'Pending',
+            'Pending Inspection', 
+            'Inspector Assigned', 
+            'Investigator Assigned', 
+            'Document Approved', 
+            'Certificate Generated', 
+            'Certified', 
+            'Reschedule Requested', 
+            'Rejected', 
+            'Flagged'
+        ], 
+        default: 'Pending Inspection' 
+    },
+    rejectionReason: { type: String },
     dateSubmitted: { type: Date, default: Date.now },
     
     // 5. Assignment Fields

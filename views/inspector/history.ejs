@@ -507,11 +507,13 @@
 
         <% if (history && history.length > 0) { %>
             <div class="history-grid">
-                <% history.forEach(function(report) { %>
+                <% history.forEach(function(report) { 
+                    if (!report.instrument) return;
+                %>
                     <div class="history-card">
                         <div class="history-header">
                             <div>
-                                <div class="inst-title"><%= report.instrument.instrumentName || report.instrument.type %></div>
+                                <div class="inst-title"><%= report.instrument.instrumentName || report.instrument.type || 'Inspected Instrument' %></div>
                                 <div class="inst-meta">Owner: <strong><%= report.instrument.ownerName %></strong> | ID: <strong style="font-family: monospace;"><%= report.instrument.instrumentId %></strong></div>
                             </div>
                             <div class="date-badge">

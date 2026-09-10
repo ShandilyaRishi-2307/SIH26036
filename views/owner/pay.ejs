@@ -456,5 +456,26 @@
             }
         });
     </script>
+
+    <script id="firebase-config" type="application/json"><%- JSON.stringify(locals.firebaseConfig || {}) %></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        const configText = document.getElementById('firebase-config').textContent;
+        const app = initializeApp(JSON.parse(configText));
+        const auth = getAuth(app);
+
+        const handleLogout = () => {
+            signOut(auth).then(() => {
+                document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                window.location.href = '/login';
+            });
+        };
+
+        const sidebarLogoutBtn = document.getElementById('sidebar-logout-btn');
+        const mobileSidebarLogoutBtn = document.getElementById('mobile-sidebar-logout-btn');
+        if (sidebarLogoutBtn) sidebarLogoutBtn.addEventListener('click', handleLogout);
+        if (mobileSidebarLogoutBtn) mobileSidebarLogoutBtn.addEventListener('click', handleLogout);
+    </script>
 </body>
 </html>

@@ -571,7 +571,7 @@
                 signInWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => userCredential.user.getIdToken())
                     .then((token) => {
-                        document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Strict`;
+                        document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax`;
                         window.location.href = '/auth/redirect';
                     })
                     .catch((error) => {

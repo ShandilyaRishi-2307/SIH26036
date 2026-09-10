@@ -381,10 +381,10 @@
                                 <tr>
                                     <td style="color: var(--ts-muted);"><%= new Date(cert.issueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
                                     <td><a href="/verify/<%= cert.certificateNumber %>" target="_blank" class="cert-id" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="View & Verify Certificate"><%= cert.certificateNumber %> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; opacity: 0.7;"></i></a></td>
-                                    <td><span class="owner-name"><%= cert.instrument.ownerName %></span></td>
+                                    <td><span class="owner-name"><%= cert.instrument ? cert.instrument.ownerName : 'Facility Owner' %></span></td>
                                     <td>
-                                        <span style="display: block; font-weight: 700; margin-bottom: 2px; font-family: monospace;"><%= cert.instrument.instrumentId %></span>
-                                        <span class="inst-type"><%= cert.instrument.type || cert.instrument.instrumentName %></span>
+                                        <span style="display: block; font-weight: 700; margin-bottom: 2px; font-family: monospace;"><%= cert.instrument ? cert.instrument.instrumentId : 'N/A' %></span>
+                                        <span class="inst-type"><%= cert.instrument ? (cert.instrument.type || cert.instrument.instrumentName) : 'Verified Scale' %></span>
                                     </td>
                                     <td><span class="status-badge">✓ ISSUED</span></td>
                                 </tr>

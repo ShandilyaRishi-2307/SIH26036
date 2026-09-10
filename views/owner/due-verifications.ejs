@@ -397,10 +397,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% dueVerifications.forEach(function(cert) { %>
+                            <% dueVerifications.forEach(function(cert) { 
+                                if (!cert.instrument) return;
+                            %>
                                 <tr>
                                     <td>
-                                        <strong><%= cert.instrument.instrumentName || cert.instrument.type %></strong>
+                                        <strong><%= cert.instrument.instrumentName || cert.instrument.type || 'Registered Instrument' %></strong>
                                         <div style="font-family: monospace; color: var(--ts-gray-600); margin-top: 4px; font-size: 12px;">ID: <%= cert.instrument.instrumentId %></div>
                                     </td>
                                     <td style="color: var(--ts-gray-600);"><%= cert.instrument.address ? (cert.instrument.address.city + ', ' + cert.instrument.address.state) : 'Registered Address' %></td>
